@@ -1,5 +1,5 @@
-from .loader import MultiTaskDataset
-
+from .loader import MultiTaskDataset, TUTDataset
+import pandas as pd
 
 def get_dataset(cfg, mode):
     task = cfg.TASK
@@ -52,4 +52,4 @@ def get_dataset(cfg, mode):
         else:
             raise NotImplementedError
     else:
-        raise NotImplementedError
+        return TUTDataset(pd.read_csv('meta.csv'), True, False)

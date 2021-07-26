@@ -34,6 +34,35 @@ def read_labeled_image_list(data_dir, data_list):
         masks.append(data_dir + mask)
     return images, masks
 
+from torch.utils.data import Dataset
+import torch
+
+class TUTDataset(Dataset):
+  def __init__(self, csv, train, test):
+    self.csv = csv
+    self.train = train
+    self.test = test
+    self.all_sound_names = self.csv[:]['name']
+    self.features = cPickle.load(open('features.pickle', 'rb'))
+    print(self.csv.columns)
+    # should replace hardcoded numbers
+    labels1_index = [x for x in range(5,30)]
+    labels2_index = [x for x in range(1,5)]
+    self.all_labels1 = np.array(self.csv.filter(self.csv.columns[labels1_index], axis=1))
+    self.all_labels2 = np.array(self.csv.filter(self.csv.columns[labels2_index], axis=1))
+
+  def __len__(self):
+    return len(self.all_sound_names)
+
+  def __getitem__(self, index):
+    feature = self.features[self.all_sound_names[index]]
+    targets1 = self.all_labels1[index]
+    targets2 = self.all_labels2[index]
+    librosa.display.specshow(feature, sr=44100)
+    print(targets1, targets2, len(targets1))
+    return torch.tensor(feature, dtype=torch.float32),
+           torch.tensor(targets1, dtype=torch.float32), 
+           torch.tensor(targets2, dtype=torch.float32)
 
 class MultiTaskDataset(Dataset):
     """MultiTaskDataset."""

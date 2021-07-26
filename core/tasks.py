@@ -13,6 +13,8 @@ def get_tasks(cfg):
     if cfg.TASK == 'pixel':
         if cfg.DATASET == 'nyu_v2':
             return SegTask(cfg), NormalTask(cfg)
+    if cfg.TASK = 'audio':
+        return MultiLabelClassificationTask(cfg), SingleLabelClassificationTask(cfg)
     
 
 class Task:
@@ -29,7 +31,33 @@ class Task:
     def aggregate_metric(self, accumulator):
         raise NotImplementedError
 
-    
+class SingleLabelClassificationTask(Task):
+
+    def __init__(self, cfg):
+        self.type = 'singleLabelClassification'
+        self.cfg = cfg
+
+    def loss(self, prediction, gt):
+        loss = nn.CrossEntropyLoss()
+        return loss(prediction, gt)
+
+    def log_visualize(self, prediction, gt, loss, writer, steps):
+        writer.add_scalar('loss/seg', loss.data.item(), steps)
+        
+class MultiLabelClassificationTask(Task):
+
+    def __init__(self, cfg):
+        self.type = 'multiLabelClassification'
+        self.cfg = cfg
+
+    def loss(self, prediction, gt):
+        m = nn.Sigmoid()
+        loss = nn.BCELoss()
+        return loss(m(prediction), gt)
+
+    def log_visualize(self, prediction, gt, loss, writer, steps):
+        writer.add_scalar('loss/seg', loss.data.item(), steps)
+
 class SegTask(Task):
     
     def __init__(self, cfg):
