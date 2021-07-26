@@ -29,13 +29,13 @@ def vgg_connectivity():
 
 
 def get_model(cfg, task1, task2):
-    if cfg.TASK == 'pixel':
+    if cfg.TASK == 'pixel' or cfg.TASK == 'audio':
         if cfg.MODEL.BACKBONE == 'VGG16':
-            net1 = DeepLabLargeFOVBN(3, cfg.MODEL.NET1_CLASSES, weights=cfg.TRAIN.WEIGHT_1)
-            net2 = DeepLabLargeFOVBN(3, cfg.MODEL.NET2_CLASSES, weights=cfg.TRAIN.WEIGHT_2)
+            net1 = DeepLabLargeFOVBN(1, cfg.MODEL.NET1_CLASSES, weights='')
+            net2 = DeepLabLargeFOVBN(1, cfg.MODEL.NET2_CLASSES, weights='')
         elif cfg.MODEL.BACKBONE == 'VGG16_13_Stage':
-            net1 = DeepLabLargeFOVBN16(3, cfg.MODEL.NET1_CLASSES, weights=cfg.TRAIN.WEIGHT_1)
-            net2 = DeepLabLargeFOVBN16(3, cfg.MODEL.NET2_CLASSES, weights=cfg.TRAIN.WEIGHT_2)
+            net1 = DeepLabLargeFOVBN16(3, cfg.MODEL.NET1_CLASSES, weights='')
+            net2 = DeepLabLargeFOVBN16(3, cfg.MODEL.NET2_CLASSES, weights='')
         else:
             raise NotImplementedError
         

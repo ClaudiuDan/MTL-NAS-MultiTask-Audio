@@ -236,6 +236,7 @@ def main():
             np.random.shuffle(indices)
 
         train_data = torch.utils.data.Subset(train_full_data, indices[:split])
+        print(len(train_data))
         val_data = torch.utils.data.Subset(train_full_data, indices[split:num_train])
 
         if distributed:
@@ -260,6 +261,7 @@ def main():
             val_sampler.set_epoch(steps)
 
         for batch_idx, (image, label_1, label_2) in enumerate(train_loader):
+            print(batch_idx)
             if cfg.CUDA:
                 image, label_1, label_2 = image.cuda(), label_1.cuda(), label_2.cuda()
 

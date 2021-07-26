@@ -6,7 +6,7 @@ _C = CN()
 #########################################################################################
 # General Parameters
 #########################################################################################
-_C.TASK = 'pixel' # pixel (segmentation & normal) vs. image (classification)
+_C.TASK = 'audio' # pixel (segmentation & normal) vs. image (classification)
 _C.DATASET = 'nyu_v2'  # or 'taskonomy'
 
 _C.LOG_DIR = 'run'  # Tensorboard log directory
@@ -114,7 +114,7 @@ _C.TRAIN.SCHEDULE = 'Poly'
 _C.TRAIN.LOG_INTERVAL = 500
 _C.TRAIN.EVAL_INTERVAL = 1000
 _C.TRAIN.SAVE_INTERVAL = 1000
-_C.TRAIN.EVAL_CKPT = True
+_C.TRAIN.EVAL_CKPT = False
 
 
 #########################################################################################

@@ -178,7 +178,7 @@ class GeneralizedMTLNASNet(nn.Module):
         return torch.ones_like(path_weights)
 
     def forward(self, x):
-        N, C, H, W = x.size()
+        # N, C, H, W = x.size()
         y = x.clone()
         x = self.net1.base(x)
         y = self.net2.base(y)

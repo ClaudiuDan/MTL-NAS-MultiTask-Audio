@@ -12,6 +12,7 @@ class DeepLabLargeFOVBN(nn.Module):
         
         self.stages = []
         layers = []
+        print('aici! ', in_dim, out_dim)
         stages = [
             (64, [
                 nn.Conv2d(in_dim, 64, kernel_size=3, stride=1, padding=1, bias=False),
@@ -91,7 +92,8 @@ class DeepLabLargeFOVBN(nn.Module):
             nn.BatchNorm2d(1024, eps=1e-03, momentum=0.05),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.5),
-            nn.Conv2d(1024, out_dim, kernel_size=1)
+            nn.Conv2d(1024, out_dim, kernel_size=1),
+            nn.AdaptiveAvgPool2d(1)
         ]
         self.head = nn.Sequential(*head)
 

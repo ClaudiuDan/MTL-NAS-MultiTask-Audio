@@ -2,6 +2,7 @@ import os
 import torch
 import torch.distributed as dist
 import torch.nn.functional as F
+import torch.nn as nn
 import numpy as np
 
 from .utils.losses import seg_loss, normal_loss
@@ -13,7 +14,7 @@ def get_tasks(cfg):
     if cfg.TASK == 'pixel':
         if cfg.DATASET == 'nyu_v2':
             return SegTask(cfg), NormalTask(cfg)
-    if cfg.TASK = 'audio':
+    if cfg.TASK == 'audio':
         return MultiLabelClassificationTask(cfg), SingleLabelClassificationTask(cfg)
     
 
@@ -38,8 +39,18 @@ class SingleLabelClassificationTask(Task):
         self.cfg = cfg
 
     def loss(self, prediction, gt):
+        # gt = torch.reshape(gt, (gt.shape[0], gt.shape[1], 1, 1))
+        prediction = torch.reshape(prediction, (prediction.shape[0], prediction.shape[1]))
+        new_gt = torch.zeros(gt.shape[0], dtype=torch.long).to(device='cuda')
+        counter = 0
+        for row in gt:
+            for i in range(len(row)):
+                if row[i] == 1:
+                    new_gt[counter] = i
+            counter += 1
         loss = nn.CrossEntropyLoss()
-        return loss(prediction, gt)
+        print(new_gt)
+        return loss(prediction, new_gt)
 
     def log_visualize(self, prediction, gt, loss, writer, steps):
         writer.add_scalar('loss/seg', loss.data.item(), steps)
@@ -51,6 +62,7 @@ class MultiLabelClassificationTask(Task):
         self.cfg = cfg
 
     def loss(self, prediction, gt):
+        gt = torch.reshape(gt, (gt.shape[0], gt.shape[1], 1, 1))
         m = nn.Sigmoid()
         loss = nn.BCELoss()
         return loss(m(prediction), gt)

@@ -3,6 +3,10 @@ import numpy as np
 from glob import glob
 import imageio
 
+import _pickle as cPickle
+import librosa
+import librosa.display
+
 import PIL
 from PIL import Image
 
@@ -14,7 +18,6 @@ import torchvision.transforms.functional as TF
 
 def read_labeled_image_list(data_dir, data_list):
     """Reads txt file containing paths to images and ground truth masks.
-
     Args:
       data_dir: path to the directory with images and masks.
       data_list: path to the file with lines of the form '/path/to/image /path/to/mask'.
@@ -46,8 +49,8 @@ class TUTDataset(Dataset):
     self.features = cPickle.load(open('features.pickle', 'rb'))
     print(self.csv.columns)
     # should replace hardcoded numbers
-    labels1_index = [x for x in range(5,30)]
-    labels2_index = [x for x in range(1,5)]
+    labels1_index = [x for x in range(6,31)]
+    labels2_index = [x for x in range(2,6)]
     self.all_labels1 = np.array(self.csv.filter(self.csv.columns[labels1_index], axis=1))
     self.all_labels2 = np.array(self.csv.filter(self.csv.columns[labels2_index], axis=1))
 
@@ -59,10 +62,10 @@ class TUTDataset(Dataset):
     targets1 = self.all_labels1[index]
     targets2 = self.all_labels2[index]
     librosa.display.specshow(feature, sr=44100)
-    print(targets1, targets2, len(targets1))
-    return torch.tensor(feature, dtype=torch.float32),
-           torch.tensor(targets1, dtype=torch.float32), 
-           torch.tensor(targets2, dtype=torch.float32)
+    print (targets2)
+    return (torch.tensor(feature, dtype=torch.float32), 
+            torch.tensor(targets1, dtype=torch.float32), 
+            torch.tensor(targets2, dtype=torch.long))
 
 class MultiTaskDataset(Dataset):
     """MultiTaskDataset."""
