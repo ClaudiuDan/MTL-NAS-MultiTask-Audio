@@ -49,7 +49,6 @@ class SingleLabelClassificationTask(Task):
                     new_gt[counter] = i
             counter += 1
         loss = nn.CrossEntropyLoss()
-        print(new_gt)
         return loss(prediction, new_gt)
 
     def log_visualize(self, prediction, gt, loss, writer, steps):

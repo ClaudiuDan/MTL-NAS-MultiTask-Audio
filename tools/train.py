@@ -8,6 +8,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tensorboardX import SummaryWriter
+from tqdm import tqdm
 
 # ad-hoc way to deal with python 3.7.4
 import os, sys
@@ -140,7 +141,7 @@ def main():
     model.train()
     steps = 0
     while steps < cfg.TRAIN.STEPS:
-        for batch_idx, (image, label_1, label_2) in enumerate(train_loader):
+        for batch_idx, (image, label_1, label_2) in tqdm(enumerate(train_loader)):
             if cfg.CUDA:
                 image, label_1, label_2 = image.cuda(), label_1.cuda(), label_2.cuda()
             optimizer.zero_grad()
@@ -152,7 +153,7 @@ def main():
             loss2 = result.loss2
 
             loss = result.loss
-            
+            # print(loss)
             # Mixed Precision
             if cfg.TRAIN.APEX:
                 with amp.scale_loss(loss, optimizer) as scaled_loss:
@@ -176,7 +177,8 @@ def main():
                 writer.add_scalar('loss/overall', loss.data.item(), steps)
                 task1.log_visualize(out1, label_1, loss1, writer, steps)
                 task2.log_visualize(out2, label_2, loss2, writer, steps)
-                writer.add_image('image', process_image(image[0], train_data.image_mean), steps)
+                # not for audio tasks
+                # writer.add_image('image', process_image(image[0], train_data.image_mean), steps)
 
             if steps % cfg.TRAIN.SAVE_INTERVAL == 0:
                 checkpoint = {

@@ -47,7 +47,6 @@ class TUTDataset(Dataset):
     self.test = test
     self.all_sound_names = self.csv[:]['name']
     self.features = cPickle.load(open('features.pickle', 'rb'))
-    print(self.csv.columns)
     # should replace hardcoded numbers
     labels1_index = [x for x in range(6,31)]
     labels2_index = [x for x in range(2,6)]
@@ -62,7 +61,6 @@ class TUTDataset(Dataset):
     targets1 = self.all_labels1[index]
     targets2 = self.all_labels2[index]
     librosa.display.specshow(feature, sr=44100)
-    print (targets2)
     return (torch.tensor(feature, dtype=torch.float32), 
             torch.tensor(targets1, dtype=torch.float32), 
             torch.tensor(targets2, dtype=torch.long))

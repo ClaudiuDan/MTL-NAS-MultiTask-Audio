@@ -151,12 +151,10 @@ class NDDRNet(nn.Module):
         y = self.net2.base(y)
         x = torch.reshape(x, (x.shape[0], 1, x.shape[1], x.shape[2]))
         y = torch.reshape(y, (y.shape[0], 1, y.shape[1], y.shape[2]))
-        print(x.shape)
 
         xs, ys = [], []
         for stage_id in range(self.num_stages):
             x = self.net1.stages[stage_id](x)
-            print(x.shape)
             y = self.net2.stages[stage_id](y)
             if isinstance(x, list):
                 x[0], y[0] = self.nddrs['nddrs'][stage_id](x[0], y[0])
