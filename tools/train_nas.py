@@ -9,6 +9,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.distributed as dist
 from tensorboardX import SummaryWriter
+from tqdm import tqdm
 
 # from apex import amp
 
@@ -259,7 +260,7 @@ def main():
             train_sampler.set_epoch(steps)  # steps is used to seed RNG
             val_sampler.set_epoch(steps)
 
-        for batch_idx, (image, label_1, label_2) in enumerate(train_loader):
+        for batch_idx, (image, label_1, label_2) in tqdm(enumerate(train_loader)):
             if cfg.CUDA:
                 image, label_1, label_2 = image.cuda(), label_1.cuda(), label_2.cuda()
 
@@ -327,7 +328,8 @@ def main():
                 writer.add_scalar('lr', scheduler.get_lr()[0], steps)
                 writer.add_scalar('arch_lr', arch_scheduler.get_lr()[0], steps)
                 writer.add_scalar('loss/overall', loss.data.item(), steps)
-                writer.add_image('image', process_image(image[0], train_full_data.image_mean), steps)
+                # not appliable to audio tasks
+                # writer.add_image('image', process_image(image[0], train_full_data.image_mean), steps)
                 task1.log_visualize(out1, label_1, loss1, writer, steps)
                 task2.log_visualize(out2, label_2, loss2, writer, steps)
                 

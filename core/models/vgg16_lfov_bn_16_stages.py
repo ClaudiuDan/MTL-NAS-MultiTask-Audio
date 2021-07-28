@@ -109,7 +109,9 @@ class DeepLabLargeFOVBN16(nn.Module):
             nn.BatchNorm2d(1024, eps=1e-03, momentum=0.05),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.5),
-            nn.Conv2d(1024, out_dim, kernel_size=1)
+            nn.Conv2d(1024, out_dim, kernel_size=1),
+            # for audio tasks
+            nn.AdaptiveAvgPool2d(1)
         ]
         self.head = nn.Sequential(*head)
 

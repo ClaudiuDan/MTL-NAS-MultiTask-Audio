@@ -173,7 +173,8 @@ def main():
                     loss1.data.item(), loss2.data.item()))
 
                 # Log to tensorboard
-                writer.add_scalar('lr', scheduler.get_lr()[0], steps)
+                # commented because of some errors
+                # writer.add_scalar('lr', scheduler.get_lr()[0], steps)
                 writer.add_scalar('loss/overall', loss.data.item(), steps)
                 task1.log_visualize(out1, label_1, loss1, writer, steps)
                 task2.log_visualize(out2, label_2, loss2, writer, steps)
