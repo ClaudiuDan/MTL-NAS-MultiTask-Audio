@@ -52,4 +52,7 @@ def get_dataset(cfg, mode):
         else:
             raise NotImplementedError
     else:
-        return TUTDataset(pd.read_csv('meta.csv'), True, False)
+        if mode == 'val' or mode == 'test':
+            return TUTDataset(pd.read_csv('meta_eval.csv'), False, True)
+        else:
+            return TUTDataset(pd.read_csv('meta.csv'), True, False)

@@ -46,7 +46,10 @@ class TUTDataset(Dataset):
     self.train = train
     self.test = test
     self.all_sound_names = self.csv[:]['name']
-    self.features = cPickle.load(open('features.pickle', 'rb'))
+    if train: 
+        self.features = cPickle.load(open('features.pickle', 'rb'))
+    else:
+        self.features = cPickle.load(open('features_eval.pickle', 'rb'))
     # should replace hardcoded numbers
     labels1_index = [x for x in range(6,31)]
     labels2_index = [x for x in range(2,6)]
