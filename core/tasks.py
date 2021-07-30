@@ -54,6 +54,19 @@ class SingleLabelClassificationTask(Task):
     def log_visualize(self, prediction, gt, loss, writer, steps):
         writer.add_scalar('loss/seg', loss.data.item(), steps)
         
+    def accumulate_metric(self, prediction, gt, accumulator, distributed=False):
+        m = nn.Sigmoid()
+        preds_classes = torch.round(m(prediction).reshape((prediction.shape[0],prediction.shape[1])))
+        correct = (preds_classes == gt).float().sum()
+        accumulator['correct_predictions'] = accumulator.get('correct_predictions', 0.) + correct
+        accumulator['total'] = accumulator.get('total', 0.) + gt.shape[0] * gt.shape[1]
+        return accumulator
+
+    def aggregate_metric(self, accumulator):
+        acc = accumulator['correct_predictions'] / accumulator['total']
+        return {
+            'Accuracy' : acc
+        }
 class MultiLabelClassificationTask(Task):
 
     def __init__(self, cfg):
@@ -68,6 +81,20 @@ class MultiLabelClassificationTask(Task):
 
     def log_visualize(self, prediction, gt, loss, writer, steps):
         writer.add_scalar('loss/seg', loss.data.item(), steps)
+        
+    def accumulate_metric(self, prediction, gt, accumulator, distributed=False):
+        m = nn.Sigmoid()
+        preds_classes = torch.round(m(prediction).reshape((prediction.shape[0],prediction.shape[1])))
+        correct = (preds_classes == gt).float().sum()
+        accumulator['correct_predictions'] = accumulator.get('correct_predictions', 0.) + correct
+        accumulator['total'] = accumulator.get('total', 0.) + gt.shape[0] * gt.shape[1]
+        return accumulator
+
+    def aggregate_metric(self, accumulator):
+        acc = accumulator['correct_predictions'] / accumulator['total']
+        return {
+            'Accuracy' : acc
+        }
 
 class SegTask(Task):
     

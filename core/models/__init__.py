@@ -25,7 +25,7 @@ def depth_limited_connectivity_matrix(stage_config, limit=3):
 
 
 def vgg_connectivity():
-    return depth_limited_connectivity_matrix([2, 2, 3, 3, 3])
+    return depth_limited_connectivity_matrix([1, 1, 2, 2, 2])
 
 
 def get_model(cfg, task1, task2):
@@ -40,7 +40,6 @@ def get_model(cfg, task1, task2):
         else:
             raise NotImplementedError
         
-
     if cfg.ARCH.SEARCHSPACE == 'GeneralizedMTLNAS':
         if cfg.MODEL.BACKBONE == 'VGG16_13_Stage':
             connectivity = vgg_connectivity

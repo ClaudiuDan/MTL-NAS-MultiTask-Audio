@@ -35,8 +35,8 @@ _C.MODEL.NDDR_BN_TYPE = 'default'
 _C.MODEL.ZERO_BATCH_NORM_GAMMA = False
 _C.MODEL.BATCH_NORM_MOMENTUM = 0.05
 
-_C.MODEL.NET1_CLASSES = 40
-_C.MODEL.NET2_CLASSES = 3
+_C.MODEL.NET1_CLASSES = 25
+_C.MODEL.NET2_CLASSES = 4
 
 
 #########################################################################################
@@ -108,13 +108,13 @@ _C.TRAIN.POWER = 0.9
 _C.TRAIN.NDDR_FACTOR = 100.
 _C.TRAIN.FC8_WEIGHT_FACTOR = 10.
 _C.TRAIN.FC8_BIAS_FACTOR = 20.
-_C.TRAIN.TASK2_FACTOR = 1.  # 20. for normal
+_C.TRAIN.TASK2_FACTOR = 5.  # 20. for normal
 _C.TRAIN.SCHEDULE = 'Poly'
 
 _C.TRAIN.LOG_INTERVAL = 20
-_C.TRAIN.EVAL_INTERVAL = 1000
-_C.TRAIN.SAVE_INTERVAL = 1000
-_C.TRAIN.EVAL_CKPT = False
+_C.TRAIN.EVAL_INTERVAL = 100
+_C.TRAIN.SAVE_INTERVAL = 100
+_C.TRAIN.EVAL_CKPT = True
 
 
 #########################################################################################
@@ -126,6 +126,6 @@ _C.TEST.RANDOM_SCALE = False
 _C.TEST.RANDOM_MIRROR = False
 _C.TEST.RANDOM_CROP = False
 
-_C.TEST.BATCH_SIZE = 4
+_C.TEST.BATCH_SIZE = 16
 
 _C.TEST.CKPT_ID = 20000
