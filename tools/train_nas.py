@@ -260,6 +260,8 @@ def main():
             train_sampler.set_epoch(steps)  # steps is used to seed RNG
             val_sampler.set_epoch(steps)
 
+        train_loss1 = []; train_loss2 = []
+        valid_loss1 = []; valid_loss2 = []
         for batch_idx, (image, label_1, label_2) in tqdm(enumerate(train_loader)):
             if cfg.CUDA:
                 image, label_1, label_2 = image.cuda(), label_1.cuda(), label_2.cuda()
@@ -325,8 +327,11 @@ def main():
                     loss1.data.item(), loss2.data.item()))
 
                 # Log to tensorboard
-                writer.add_scalar('lr', scheduler.get_lr()[0], steps)
-                writer.add_scalar('arch_lr', arch_scheduler.get_lr()[0], steps)
+                try:
+                    writer.add_scalar('lr', scheduler.get_last_lr()[0], steps)
+                except:
+                    print ('learning rate error')
+                writer.add_scalar('arch_lr', arch_scheduler.get_last_lr()[0], steps)
                 writer.add_scalar('loss/overall', loss.data.item(), steps)
                 # not appliable to audio tasks
                 # writer.add_image('image', process_image(image[0], train_full_data.image_mean), steps)

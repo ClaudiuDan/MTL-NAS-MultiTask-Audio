@@ -52,7 +52,8 @@ def get_dataset(cfg, mode):
         else:
             raise NotImplementedError
     else:
+        clip = '_1000ms'
         if mode == 'val' or mode == 'test':
-            return TUTDataset(pd.read_csv('meta_eval.csv'), False, True)
+            return TUTDataset(pd.read_csv('meta_eval' + clip + '.csv'), False, True, clip)
         else:
-            return TUTDataset(pd.read_csv('meta.csv'), True, False)
+            return TUTDataset(pd.read_csv('meta' + clip + '.csv'), True, False, clip)

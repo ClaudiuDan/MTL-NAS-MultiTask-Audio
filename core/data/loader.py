@@ -41,15 +41,15 @@ from torch.utils.data import Dataset
 import torch
 
 class TUTDataset(Dataset):
-  def __init__(self, csv, train, test):
+  def __init__(self, csv, train, test, clip=None):
     self.csv = csv
     self.train = train
     self.test = test
     self.all_sound_names = self.csv[:]['name']
     if train: 
-        self.features = cPickle.load(open('features.pickle', 'rb'))
+        self.features = cPickle.load(open('features' + clip + '.pickle', 'rb'))
     else:
-        self.features = cPickle.load(open('features_eval.pickle', 'rb'))
+        self.features = cPickle.load(open('features_eval' + clip + '.pickle', 'rb'))
     # should replace hardcoded numbers
     labels1_index = [x for x in range(6,31)]
     labels2_index = [x for x in range(2,6)]

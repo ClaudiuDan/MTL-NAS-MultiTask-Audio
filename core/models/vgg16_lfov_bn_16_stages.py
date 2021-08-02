@@ -26,8 +26,8 @@ class DeepLabLargeFOVBN16(nn.Module):
             #     nn.ReLU(inplace=True)
             # ]),
             (128, [
-                nn.ConstantPad2d((0, 1, 0, 1), 0),  # TensorFlow 'SAME' behavior
-                nn.MaxPool2d(3, stride=2),
+                nn.ConstantPad2d((0, 1, 0, 1), 0),  # TensorFlow 'ScAME' behavior
+                # nn.MaxPool2d(3, stride=2),
                 nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1, bias=False),
                 nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
                 nn.ReLU(inplace=True)
