@@ -30,6 +30,8 @@ def get_tp_fp_fn(preds, gts):
     return tp, fp, fn
 
 def get_f_score(tp, fp, fn):
+    if tp + fp == 0:
+        return 0
     precision = tp / (tp + fp)
     recall = tp / (tp + fn)
     return 2 * precision * recall / (precision + recall)

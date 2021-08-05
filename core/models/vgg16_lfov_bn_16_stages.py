@@ -20,71 +20,54 @@ class DeepLabLargeFOVBN16(nn.Module):
                 nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
                 nn.ReLU(inplace=True)
             ]),
-            # (64, [
-            #     nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
-            #     nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
-            #     nn.ReLU(inplace=True)
-            # ]),
-            (128, [
-                nn.ConstantPad2d((0, 1, 0, 1), 0),  # TensorFlow 'ScAME' behavior
-                # nn.MaxPool2d(3, stride=2),
-                nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-            # (128, [
-            #     nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, bias=False),
-            #     nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
-            #     nn.ReLU(inplace=True)
-            # ]),
-            (256, [
-                nn.ConstantPad2d((0, 1, 0, 1), 0),  # TensorFlow 'SAME' behavior
+            (64, [
                 nn.MaxPool2d(3, stride=2),
-                nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(256, eps=1e-03, momentum=0.05),
+                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
+                nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
                 nn.ReLU(inplace=True)
             ]),
-            (256, [
-                nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(256, eps=1e-03, momentum=0.05),
+            (64, [
+                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
+                nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
                 nn.ReLU(inplace=True)
             ]),
-            # (256, [
-            #     nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1, bias=False),
-            #     nn.BatchNorm2d(256, eps=1e-03, momentum=0.05),
+            (64, [
+                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
+                nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
+                nn.ReLU(inplace=True)
+            ]),
+            (64, [
+                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
+                nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
+                nn.ReLU(inplace=True)
+            ]),
+            # (512, [
+            #     nn.ConstantPad2d((0, 1, 0, 1), 0),  # TensorFlow 'SAME' behavior
+            #     nn.MaxPool2d(3, stride=2),
+            #     nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1, bias=False),
+            #     nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
             #     nn.ReLU(inplace=True)
             # ]),
-            (512, [
-                nn.ConstantPad2d((0, 1, 0, 1), 0),  # TensorFlow 'SAME' behavior
-                nn.MaxPool2d(3, stride=2),
-                nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-            (512, [
-                nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
             # (512, [
             #     nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1, bias=False),
             #     nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
             #     nn.ReLU(inplace=True)
             # ]),
-            (512, [
-                nn.MaxPool2d(3, stride=1, padding=1),
-                nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=2, dilation=2, bias=False),
-                nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
             # (512, [
-            #     nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=2, dilation=2, bias=False),
+            #     nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1, bias=False),
             #     nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
             #     nn.ReLU(inplace=True)
             # ]),
-            (512, [
-                nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=2, dilation=2, bias=False),
-                nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
+            (128, [
+                nn.ConstantPad2d((0, 1, 0, 1), 0),  # TensorFlow 'SAME' behavior
+                # nn.MaxPool2d(3, stride=2),
+                nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=2, dilation=2, bias=False),
+                nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
+                nn.ReLU(inplace=True)
+            ]),
+            (128, [
+                nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=2, dilation=2, bias=False),
+                nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
                 nn.ReLU(inplace=True)
             ]),
         ]
@@ -101,15 +84,15 @@ class DeepLabLargeFOVBN16(nn.Module):
             nn.MaxPool2d(3, stride=1, padding=1),
             # must use count_include_pad=False to make sure result is same as TF
             nn.AvgPool2d(3, stride=1, padding=1, count_include_pad=False),
-            nn.Conv2d(512, 1024, kernel_size=3, stride=1, padding=12, dilation=12, bias=False),
-            nn.BatchNorm2d(1024, eps=1e-03, momentum=0.05),
+            nn.Conv2d(128, 512, kernel_size=3, stride=1, padding=12, dilation=12, bias=False),
+            nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.5),
-            nn.Conv2d(1024, 1024, kernel_size=1, stride=1, padding=0, bias=False),
-            nn.BatchNorm2d(1024, eps=1e-03, momentum=0.05),
+            nn.Conv2d(512, 512, kernel_size=1, stride=1, padding=0, bias=False),
+            nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.5),
-            nn.Conv2d(1024, out_dim, kernel_size=1),
+            nn.Conv2d(512, out_dim, kernel_size=1),
             # for audio tasks
             nn.AdaptiveAvgPool2d(1)
         ]

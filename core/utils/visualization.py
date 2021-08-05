@@ -67,6 +67,25 @@ def save_heatmap(matrix, filename, vmin=0., vmax=1.):
     return np.array(img).transpose((2, 0, 1))
 
 
+def save_loss_plots(train1, train2, valid1, valid2, counts, filename):
+    plt.figure()
+    plt.subplot(211)
+    plt.plot(counts, train1, label='train')
+    plt.plot(counts, valid1, label='validation')
+    plt.xlabel('Iteration')
+    plt.ylabel('Loss')
+    plt.title('Event Classification (Task 1)')
+    plt.legend()
+    plt.subplot(212)
+    plt.plot(counts, train2, label='train')
+    plt.plot(counts, valid2, label='validation')
+    plt.xlabel('Iteration')
+    plt.ylabel('Loss')
+    plt.title('Scene Classification (Task 2)')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(filename + '/loss')
+
 def _process_params(G, center, dim):
 
     if not isinstance(G, nx.Graph):
@@ -178,8 +197,9 @@ def save_connectivity(net1, net2, connectivity1, connectivity2, filename, align=
     nx.draw(G, pos=pos, labels=labels, node_color=node_color, edge_color=edge_color, with_labels=with_labels)
     nx.draw_networkx_edges(G, pos=pos, edgelist=pos_edges, edge_color='xkcd:violet')
     arcs = nx.draw_networkx_edges(G, pos=pos, edgelist=neg_edges, edge_color='xkcd:silver', alpha=0.3)
-    for arc in arcs:
-        arc.set_linestyle('dotted')
+    if arcs != None:
+        for arc in arcs:
+            arc.set_linestyle('dotted')
     plt.savefig(filename)
     img = Image.open(filename)
     return np.array(img).transpose((2, 0, 1))

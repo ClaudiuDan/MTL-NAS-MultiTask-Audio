@@ -230,7 +230,7 @@ def main():
             if steps >= cfg.TRAIN.STEPS:
                 break
             steps += 1
-    print(train_loss1, valid_loss1)
+            
     loss_path = os.path.join(experiment_log_dir, 'loss')
     if not os.path.isdir(loss_path):
         os.makedirs(loss_path)

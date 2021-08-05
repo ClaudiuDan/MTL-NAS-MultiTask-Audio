@@ -25,7 +25,7 @@ def depth_limited_connectivity_matrix(stage_config, limit=3):
 
 
 def vgg_connectivity():
-    return depth_limited_connectivity_matrix([1, 1, 2, 2, 2])
+    return depth_limited_connectivity_matrix([1, 4, 2])
 
 
 def get_model(cfg, task1, task2):

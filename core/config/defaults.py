@@ -7,6 +7,7 @@ _C = CN()
 # General Parameters
 #########################################################################################
 _C.TASK = 'audio' # pixel (segmentation & normal) vs. image (classification)
+_C.TYPE = '_100ms'
 _C.DATASET = 'nyu_v2'  # or 'taskonomy'
 
 _C.LOG_DIR = 'run'  # Tensorboard log directory
@@ -50,7 +51,7 @@ _C.ARCH.TRAIN_SPLIT = 0.5  # portion of the original training data to keep, with
 _C.ARCH.MIXED_DATA = True
 
 # Optimization
-_C.ARCH.OPTIMIZER = ''
+_C.ARCH.OPTIMIZER = 'GeneralizedMTLNAS'
 _C.ARCH.LR = 3e-3
 _C.ARCH.WEIGHT_DECAY = 1e-3
 
@@ -98,8 +99,8 @@ _C.TRAIN.OUTPUT_SIZE = (100, 100)
 _C.TRAIN.WEIGHT_1 = 'DeepLab'
 _C.TRAIN.WEIGHT_2 = 'DeepLab'
 
-_C.TRAIN.BATCH_SIZE = 16
-_C.TRAIN.STEPS = 51
+_C.TRAIN.BATCH_SIZE = 32
+_C.TRAIN.STEPS = 300
 _C.TRAIN.WARMUP = 0
 _C.TRAIN.LR = 0.0001
 _C.TRAIN.MOMENTUM = 0.9
@@ -126,6 +127,6 @@ _C.TEST.RANDOM_SCALE = False
 _C.TEST.RANDOM_MIRROR = False
 _C.TEST.RANDOM_CROP = False
 
-_C.TEST.BATCH_SIZE = 16
+_C.TEST.BATCH_SIZE = 32
 
 _C.TEST.CKPT_ID = 20000

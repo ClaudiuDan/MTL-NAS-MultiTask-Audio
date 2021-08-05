@@ -25,7 +25,7 @@ from core.tasks import get_tasks
 from core.models import get_model
 from core.utils import get_print
 from core.utils.losses import entropy_loss, l1_loss
-from core.utils.visualization import process_image, save_heatmap, save_connectivity
+from core.utils.visualization import process_image, save_heatmap, save_connectivity, save_loss_plots
 
 from eval import evaluate
 
@@ -227,8 +227,14 @@ def main():
     if cfg.TRAIN.APEX:
         model, [arch_optimizer, optimizer] = amp.initialize(model, [arch_optimizer, optimizer], opt_level="O1", num_losses=2)
 
+    train_loss1 = []; train_loss2 = []
+    valid_loss1 = []; valid_loss2 = []
+    counts = []
+
     model.train()
     steps = 0
+    test_iter = iter(test_loader)
+
     while steps < cfg.TRAIN.STEPS:
         # Initialize train/val dataloader below this shuffle operation
         # to ensure both arch and weights gets to see all the data,
@@ -259,9 +265,7 @@ def main():
         if distributed:
             train_sampler.set_epoch(steps)  # steps is used to seed RNG
             val_sampler.set_epoch(steps)
-
-        train_loss1 = []; train_loss2 = []
-        valid_loss1 = []; valid_loss2 = []
+            
         for batch_idx, (image, label_1, label_2) in tqdm(enumerate(train_loader)):
             if cfg.CUDA:
                 image, label_1, label_2 = image.cuda(), label_1.cuda(), label_2.cuda()
@@ -326,6 +330,16 @@ def main():
                            100. * batch_idx / len(train_loader), loss.data.item(),
                     loss1.data.item(), loss2.data.item()))
 
+                image_test, label_1_test, label_2_test = test_iter.next()
+                if cfg.CUDA:
+                    image_test, label_1_test, label_2_test = image_test.cuda(), label_1_test.cuda(), label_2_test.cuda()
+                model.eval()
+                result_test = model.loss(image_test, (label_1_test, label_2_test))
+                model.train()
+                train_loss1.append(loss1.data.item()); train_loss2.append(loss2.data.item())
+                valid_loss1.append(result_test.loss1.data.item()); valid_loss2.append(result_test.loss2.data.item())
+                counts.append(steps)
+                
                 # Log to tensorboard
                 try:
                     writer.add_scalar('lr', scheduler.get_last_lr()[0], steps)
@@ -418,6 +432,10 @@ def main():
                 break
             steps += 1  # train for one extra iteration to allow time for tensorboard logging..
 
+    loss_path = os.path.join(experiment_log_dir, 'loss')
+    if not os.path.isdir(loss_path):
+        os.makedirs(loss_path)
+    save_loss_plots(train_loss1, train_loss2, valid_loss1, valid_loss2, counts, loss_path)
 
 if __name__ == '__main__':
     main()
