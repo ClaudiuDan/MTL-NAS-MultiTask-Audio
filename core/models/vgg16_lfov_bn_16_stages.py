@@ -3,7 +3,6 @@ import torch.nn as nn
 from core.models.common_layers import Stage
 from core.config import cfg
 
-
 class DeepLabLargeFOVBN16(nn.Module):
     def __init__(self, in_dim, out_dim, weights='DeepLab', *args, **kwargs):
         super(DeepLabLargeFOVBN16, self).__init__(*args, **kwargs)
@@ -60,7 +59,7 @@ class DeepLabLargeFOVBN16(nn.Module):
             # ]),
             (128, [
                 nn.ConstantPad2d((0, 1, 0, 1), 0),  # TensorFlow 'SAME' behavior
-                # nn.MaxPool2d(3, stride=2),
+                nn.MaxPool2d(3, stride=2),
                 nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=2, dilation=2, bias=False),
                 nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
                 nn.ReLU(inplace=True)
@@ -81,6 +80,7 @@ class DeepLabLargeFOVBN16(nn.Module):
         self.features = nn.Sequential(*layers)
 
         head = [
+
             nn.MaxPool2d(3, stride=1, padding=1),
             # must use count_include_pad=False to make sure result is same as TF
             nn.AvgPool2d(3, stride=1, padding=1, count_include_pad=False),

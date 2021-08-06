@@ -4,7 +4,8 @@ from .supernet import GeneralizedMTLNASNet
 from .nddr_net import SingleTaskNet, SharedFeatureNet, NDDRNet
 from .vgg16_lfov_bn import DeepLabLargeFOVBN
 from .vgg16_lfov_bn_16_stages import DeepLabLargeFOVBN16
-
+from .jointly_event_branch import EventBranch
+from .jointly_scene_branch import SceneBranch
 
 def depth_limited_connectivity_matrix(stage_config, limit=3):
     """
@@ -25,7 +26,7 @@ def depth_limited_connectivity_matrix(stage_config, limit=3):
 
 
 def vgg_connectivity():
-    return depth_limited_connectivity_matrix([1, 4, 2])
+    return depth_limited_connectivity_matrix([3, 2, 2])
 
 
 def get_model(cfg, task1, task2):
@@ -35,8 +36,8 @@ def get_model(cfg, task1, task2):
             net1 = DeepLabLargeFOVBN(1, cfg.MODEL.NET1_CLASSES, weights='')
             net2 = DeepLabLargeFOVBN(1, cfg.MODEL.NET2_CLASSES, weights='')
         elif cfg.MODEL.BACKBONE == 'VGG16_13_Stage':
-            net1 = DeepLabLargeFOVBN16(1, cfg.MODEL.NET1_CLASSES, weights='')
-            net2 = DeepLabLargeFOVBN16(1, cfg.MODEL.NET2_CLASSES, weights='')
+            net1 = EventBranch(1, cfg.MODEL.NET1_CLASSES, weights='')
+            net2 = SceneBranch(1, cfg.MODEL.NET2_CLASSES, weights='')
         else:
             raise NotImplementedError
         

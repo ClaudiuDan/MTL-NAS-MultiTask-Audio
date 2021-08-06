@@ -10,17 +10,19 @@ class Reshape0(torch.nn.Module):
 class Reshape1(torch.nn.Module):
     def forward(self, x):
         x2 = x.permute(3, 0, 1, 2)
-        x2 = x2.reshape(50, cfg.TRAIN.BATCH_SIZE)
+        print(x2.shape)
+        x2 = x2.reshape(26, cfg.TRAIN.BATCH_SIZE, -1)
         return x2
 
 class Reshape2(torch.nn.Module):
     def forward(self, x):
-        return x.permute(1, 0, 2)
+        print(x[0].shape, x[0].permute(1, 0, 2).shape)
+        return x[0].permute(1, 0, 2)
         
 
-class SceneBranch(nn.Module):
+class EventBranch(nn.Module):
     def __init__(self, in_dim, out_dim, weights='DeepLab', *args, **kwargs):
-        super(SceneBranch, self).__init__(*args, **kwargs)
+        super(EventBranch, self).__init__(*args, **kwargs)
         self.in_dim = in_dim
         self.out_dim = out_dim
         self.fc_id = "head.10"
@@ -79,24 +81,15 @@ class SceneBranch(nn.Module):
         # Used for backward compatibility with weight loading
         self.features = nn.Sequential(*layers)
 
-
         head = [
-            nn.MaxPool2d(3, stride=1, padding=1),
-            # must use count_include_pad=False to make sure result is same as TF
-            nn.AvgPool2d(3, stride=1, padding=1, count_include_pad=False),
-            nn.Conv2d(128, 512, kernel_size=3, stride=1, padding=12, dilation=12, bias=False),
-            nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
-            nn.ReLU(inplace=True),
-            nn.Dropout(p=0.5),
-            nn.Conv2d(512, 512, kernel_size=1, stride=1, padding=0, bias=False),
-            nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
-            nn.ReLU(inplace=True),
-            nn.Dropout(p=0.5),
-            nn.Conv2d(512, out_dim, kernel_size=1),
-            # for audio tasks
-            nn.AdaptiveAvgPool2d(1)
+            Reshape1(),
+            nn.GRU(128, 64, 1, bidirectional=True),
+            Reshape2(),
+            nn.Linear(64 * 2, 32),
+            nn.ReLU(),
+            nn.Dropout(p=0.15),
+            nn.Linear(32, 25)
         ]
-
         self.head = nn.Sequential(*head)
 
         self.weights = weights
