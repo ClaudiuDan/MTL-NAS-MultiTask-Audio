@@ -97,7 +97,7 @@ class MultiLabelClassificationTask(Task):
         self.cfg = cfg
 
     def loss(self, prediction, gt):
-        gt = torch.reshape(gt, (gt.shape[0], gt.shape[1], 1, 1))
+        gt = torch.reshape(gt, (gt.shape[0], gt.shape[1], gt.shape[2]))
         m = nn.Sigmoid()
         loss = nn.BCELoss()
         return loss(m(prediction), gt)
@@ -107,7 +107,7 @@ class MultiLabelClassificationTask(Task):
         
     def accumulate_metric(self, prediction, gt, accumulator, distributed=False):
         m = nn.Sigmoid()
-        preds_classes = torch.round(m(prediction).reshape((prediction.shape[0],prediction.shape[1])))
+        preds_classes = torch.round(m(prediction).reshape((prediction.shape[0],prediction.shape[1], prediction.shape[2])))
         correct = (preds_classes == gt).float().sum()
         accumulator['correct_predictions'] = accumulator.get('correct_predictions', 0.) + correct
         accumulator['total'] = accumulator.get('total', 0.) + gt.shape[0] * gt.shape[1]

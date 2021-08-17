@@ -2,6 +2,7 @@ import os
 import numpy as np
 from glob import glob
 import imageio
+import csv
 
 import _pickle as cPickle
 import librosa
@@ -41,11 +42,13 @@ from torch.utils.data import Dataset
 import torch
 
 class TUTDataset(Dataset):
-  def __init__(self, csv, train, test, clip=None):
-    self.csv = csv
+  def __init__(self, csv1, train, test, clip=None, csv2=None):
+    print(csv2)
+    self.csv1 = csv1
+    self.csv2 = csv2
     self.train = train
     self.test = test
-    self.all_sound_names = self.csv[:]['name']
+    self.all_sound_names = self.csv1[:]['name']
     if train: 
         self.features = cPickle.load(open('features' + clip + '.pickle', 'rb'))
     else:
@@ -53,17 +56,39 @@ class TUTDataset(Dataset):
     # should replace hardcoded numbers
     labels1_index = [x for x in range(6,31)]
     labels2_index = [x for x in range(2,6)]
-    self.all_labels1 = np.array(self.csv.filter(self.csv.columns[labels1_index], axis=1))
-    self.all_labels2 = np.array(self.csv.filter(self.csv.columns[labels2_index], axis=1))
+    # print(self.csv2)
+    if self.csv2 is not None:
+        self.set_frame_labels()
+
+    self.all_labels1 = np.array(self.csv1.filter(self.csv1.columns[labels1_index], axis=1))
+    self.all_labels2 = np.array(self.csv1.filter(self.csv1.columns[labels2_index], axis=1))
+
+  def set_frame_labels(self):
+    self.all_labels_frame = {}
+
+    for name in self.all_sound_names:
+        self.all_labels_frame[name] = []
+
+    for _, line in self.csv2.iterrows():
+        index = line[0].rfind('_')
+        split_name = line[0][0:index]
+        self.all_labels_frame[split_name].append(line[1:26].to_numpy())
+
 
   def __len__(self):
     return len(self.all_sound_names)
 
   def __getitem__(self, index):
     feature = self.features[self.all_sound_names[index]]
-    targets1 = self.all_labels1[index]
     targets2 = self.all_labels2[index]
-    librosa.display.specshow(feature, sr=44100)
+    if self.csv2 is None:
+        targets1 = self.all_labels1[index]
+    else:
+        targets1 = self.all_labels_frame[self.all_sound_names[index]]
+    # librosa.display.specshow(feature, sr=44100)
+    if(torch.tensor(targets1, dtype=torch.float32).shape[0] == 1000):
+        print(self.all_sound_names[index])
+    
     return (torch.tensor(feature, dtype=torch.float32), 
             torch.tensor(targets1, dtype=torch.float32), 
             torch.tensor(targets2, dtype=torch.long))

@@ -54,6 +54,18 @@ def get_dataset(cfg, mode):
     else:
         clip = cfg.TYPE
         if mode == 'val' or mode == 'test':
-            return TUTDataset(pd.read_csv('meta_eval' + clip + '.csv'), False, True, clip)
+            # print('aici')
+            csv1 = pd.read_csv('meta_eval' + clip + '.csv')
+            if cfg.FRAME:
+                csv2 = pd.read_csv('meta_eval' + clip + '_frame' '.csv', index_col=0)
+                return TUTDataset(csv1, False, True, clip, csv2)
+            else:
+                return TUTDataset(csv1, False, True, clip)
         else:
-            return TUTDataset(pd.read_csv('meta' + clip + '.csv'), True, False, clip)
+            csv1 = pd.read_csv('meta' + clip + '.csv')
+            if cfg.FRAME:
+                csv2 = pd.read_csv('meta' + clip + '_frame' '.csv', index_col=0)
+                return TUTDataset(csv1, True, False, clip, csv2)
+            else:
+                # print('aici')
+                return TUTDataset(csv1, True, False, clip)

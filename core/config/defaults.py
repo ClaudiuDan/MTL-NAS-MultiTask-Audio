@@ -7,7 +7,8 @@ _C = CN()
 # General Parameters
 #########################################################################################
 _C.TASK = 'audio' # pixel (segmentation & normal) vs. image (classification)
-_C.TYPE = '_1000ms'
+_C.TYPE = '_10Kms'
+_C.FRAME = True
 _C.DATASET = 'nyu_v2'  # or 'taskonomy'
 
 _C.LOG_DIR = 'run'  # Tensorboard log directory
@@ -100,7 +101,7 @@ _C.TRAIN.WEIGHT_1 = 'DeepLab'
 _C.TRAIN.WEIGHT_2 = 'DeepLab'
 
 _C.TRAIN.BATCH_SIZE = 16
-_C.TRAIN.STEPS = 1
+_C.TRAIN.STEPS = 101
 _C.TRAIN.WARMUP = 0
 _C.TRAIN.LR = 0.00001
 _C.TRAIN.MOMENTUM = 0.9
@@ -115,7 +116,7 @@ _C.TRAIN.SCHEDULE = 'Poly'
 _C.TRAIN.LOG_INTERVAL = 5
 _C.TRAIN.EVAL_INTERVAL = 100
 _C.TRAIN.SAVE_INTERVAL = 100
-_C.TRAIN.EVAL_CKPT = True
+_C.TRAIN.EVAL_CKPT = False
 
 
 #########################################################################################

@@ -53,6 +53,7 @@ def main():
     if not os.path.exists(experiment_log_dir):
         os.makedirs(experiment_log_dir)
     writer = SummaryWriter(logdir=experiment_log_dir)
+    
     printf = get_print(experiment_log_dir)
     printf("Training with Config: ")
     printf(cfg)
@@ -105,7 +106,8 @@ def main():
             base_params.append(v)
     
     if not cfg.MODEL.SINGLETASK and not cfg.MODEL.SHAREDFEATURE:
-        assert len(nddr_params) > 0 and len(fc8_weights) > 0 and len(fc8_bias) > 0
+        print(len(nddr_params), len(fc8_weights), len(fc8_bias))
+        # assert len(nddr_params) > 0 and len(fc8_weights) > 0 and len(fc8_bias) > 0
 
     parameter_dict = [
         {'params': fc8_weights, 'lr': cfg.TRAIN.LR * cfg.TRAIN.FC8_WEIGHT_FACTOR},
@@ -143,7 +145,8 @@ def main():
     counts = []
     model.train()
     steps = 0
-    test_iter = iter(test_loader)
+    if cfg.TRAIN.EVAL_CKPT:
+        test_iter = iter(test_loader)
     while steps < cfg.TRAIN.STEPS:
         for batch_idx, (image, label_1, label_2) in tqdm(enumerate(train_loader)):
             if cfg.CUDA:
@@ -176,15 +179,16 @@ def main():
                            100. * batch_idx / len(train_loader), loss.data.item(),
                     loss1.data.item(), loss2.data.item()))
 
-                image_test, label_1_test, label_2_test = test_iter.next()
-                if cfg.CUDA:
-                    image_test, label_1_test, label_2_test = image_test.cuda(), label_1_test.cuda(), label_2_test.cuda()
-                model.eval()
-                result_test = model.loss(image_test, (label_1_test, label_2_test))
-                model.train()
-                train_loss1.append(loss1.data.item()); train_loss2.append(loss2.data.item())
-                valid_loss1.append(result_test.loss1.data.item()); valid_loss2.append(result_test.loss2.data.item())
+                if cfg.TRAIN.EVAL_CKPT:
+                    image_test, label_1_test, label_2_test = test_iter.next()
+                    if cfg.CUDA:
+                        image_test, label_1_test, label_2_test = image_test.cuda(), label_1_test.cuda(), label_2_test.cuda()
+                    model.eval()
+                    result_test = model.loss(image_test, (label_1_test, label_2_test))
+                    model.train()
+                    valid_loss1.append(result_test.loss1.data.item()); valid_loss2.append(result_test.loss2.data.item())
                 counts.append(steps)
+                train_loss1.append(loss1.data.item()); train_loss2.append(loss2.data.item())
                 # Log to tensorboard
                 # commented because of some errors
                 # writer.add_scalar('lr', scheduler.get_lr()[0], steps)
@@ -230,7 +234,7 @@ def main():
             if steps >= cfg.TRAIN.STEPS:
                 break
             steps += 1
-            
+
     loss_path = os.path.join(experiment_log_dir, 'loss')
     if not os.path.isdir(loss_path):
         os.makedirs(loss_path)

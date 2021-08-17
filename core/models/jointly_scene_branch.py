@@ -3,20 +3,18 @@ import torch.nn as nn
 from core.models.common_layers import Stage
 from core.config import cfg
 
+class Reshape(torch.nn.Module):
+    def forward(self, x):
+        x = x.reshape(x.shape[0], -1)
+        return x
+
 class Reshape0(torch.nn.Module):
     def forward(self, x):
         return x.permute(0, 1, 3, 2)
 
-class Reshape1(torch.nn.Module):
+class PrintReshape(torch.nn.Module):
     def forward(self, x):
-        x2 = x.permute(3, 0, 1, 2)
-        x2 = x2.reshape(50, cfg.TRAIN.BATCH_SIZE)
-        return x2
-
-class Reshape2(torch.nn.Module):
-    def forward(self, x):
-        return x.permute(1, 0, 2)
-        
+        return x
 
 class SceneBranch(nn.Module):
     def __init__(self, in_dim, out_dim, weights='DeepLab', *args, **kwargs):
@@ -81,20 +79,19 @@ class SceneBranch(nn.Module):
 
 
         head = [
-            nn.MaxPool2d(3, stride=1, padding=1),
-            # must use count_include_pad=False to make sure result is same as TF
-            nn.AvgPool2d(3, stride=1, padding=1, count_include_pad=False),
-            nn.Conv2d(128, 512, kernel_size=3, stride=1, padding=12, dilation=12, bias=False),
-            nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
-            nn.ReLU(inplace=True),
-            nn.Dropout(p=0.5),
-            nn.Conv2d(512, 512, kernel_size=1, stride=1, padding=0, bias=False),
-            nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
-            nn.ReLU(inplace=True),
-            nn.Dropout(p=0.5),
-            nn.Conv2d(512, out_dim, kernel_size=1),
-            # for audio tasks
-            nn.AdaptiveAvgPool2d(1)
+            nn.Conv2d(128,256,kernel_size=(3,3),stride=1,padding=(1,1)),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            nn.MaxPool2d((1, 25)),
+            nn.Conv2d(256,256,kernel_size=(3,3),stride=1,padding=(1,1)),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            nn.MaxPool2d((1, 20)),
+            Reshape(),
+            nn.Linear(256, 32),
+            nn.ReLU(),
+            nn.Dropout(p=0.15),
+            nn.Linear(32,4)
         ]
 
         self.head = nn.Sequential(*head)

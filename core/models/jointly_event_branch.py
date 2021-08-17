@@ -6,17 +6,17 @@ from core.config import cfg
 class Reshape0(torch.nn.Module):
     def forward(self, x):
         return x.permute(0, 1, 3, 2)
+        
 
 class Reshape1(torch.nn.Module):
     def forward(self, x):
         x2 = x.permute(3, 0, 1, 2)
-        print(x2.shape)
-        x2 = x2.reshape(26, cfg.TRAIN.BATCH_SIZE, -1)
+        x2 = x2.reshape(x2.shape[0], x2.shape[1], -1)
         return x2
 
 class Reshape2(torch.nn.Module):
     def forward(self, x):
-        print(x[0].shape, x[0].permute(1, 0, 2).shape)
+        # print(x[0].shape, x[0].permute(1, 0, 2).shape)
         return x[0].permute(1, 0, 2)
         
 
