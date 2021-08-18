@@ -17,16 +17,11 @@ def get_tasks(cfg):
     if cfg.TASK == 'audio':
         return MultiLabelClassificationTask(cfg), SingleLabelClassificationTask(cfg)
     
-
 def get_tp_fp_fn(preds, gts):
     tp = 0; fp = 0; fn = 0
-    for pred, gt in zip(preds.flatten(), gts.flatten()):
-        if pred == 1 and gt == 0:
-            fp += 1
-        if pred == 1 and gt == 1:
-            tp += 1
-        if pred == 0 and gt == 1:
-            fn += 1
+    tp = ((preds == 1) & (gts == 1)).float().sum()
+    fp = ((preds == 1) & (gts == 0)).float().sum()
+    fn = ((preds == 0) & (gts == 1)).float().sum()
     return tp, fp, fn
 
 def get_f_score(tp, fp, fn):
@@ -110,7 +105,7 @@ class MultiLabelClassificationTask(Task):
         preds_classes = torch.round(m(prediction).reshape((prediction.shape[0],prediction.shape[1], prediction.shape[2])))
         correct = (preds_classes == gt).float().sum()
         accumulator['correct_predictions'] = accumulator.get('correct_predictions', 0.) + correct
-        accumulator['total'] = accumulator.get('total', 0.) + gt.shape[0] * gt.shape[1]
+        accumulator['total'] = accumulator.get('total', 0.) + gt.shape[0] * gt.shape[1] * gt.shape[2]
         tp, fp, fn = get_tp_fp_fn(preds_classes, gt)
         accumulator['tp'] = accumulator.get('tp', 0) + tp
         accumulator['fp'] = accumulator.get('fp', 0) + fp

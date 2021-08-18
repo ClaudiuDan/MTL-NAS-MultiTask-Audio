@@ -177,7 +177,7 @@ def main():
         else:
             assert 'alpha' not in k
             base_params.append(v)
-    assert len(nddr_params) > 0 and len(fc8_weights) > 0 and len(fc8_bias) > 0
+    # assert len(nddr_params) > 0 and len(fc8_weights) > 0 and len(fc8_bias) > 0
 
     parameter_dict = [
         {'params': base_params},
