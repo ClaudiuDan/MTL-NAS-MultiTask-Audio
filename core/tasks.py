@@ -85,10 +85,10 @@ class SingleLabelClassificationTask(Task):
             'Accuracy (TASK 2)' : acc,
             'F-Score (TASK 2)' : get_f_score(accumulator['tp'], accumulator['fp'], accumulator['fn'])
         }
-class MultiLabelClassificationTask(Task):
+class MultiLabelFrameClassificationTask(Task):
 
     def __init__(self, cfg):
-        self.type = 'multiLabelClassification'
+        self.type = 'multiLabelFrameClassification'
         self.cfg = cfg
 
     def loss(self, prediction, gt):
@@ -106,6 +106,40 @@ class MultiLabelClassificationTask(Task):
         correct = (preds_classes == gt).float().sum()
         accumulator['correct_predictions'] = accumulator.get('correct_predictions', 0.) + correct
         accumulator['total'] = accumulator.get('total', 0.) + gt.shape[0] * gt.shape[1] * gt.shape[2]
+        tp, fp, fn = get_tp_fp_fn(preds_classes, gt)
+        accumulator['tp'] = accumulator.get('tp', 0) + tp
+        accumulator['fp'] = accumulator.get('fp', 0) + fp
+        accumulator['fn'] = accumulator.get('fn', 0) + fn
+        return accumulator
+
+    def aggregate_metric(self, accumulator):
+        acc = accumulator['correct_predictions'] / accumulator['total']
+        return {
+            'Accuracy (TASK 1)' : acc,
+            'F-Score (TASK 1)' : get_f_score(accumulator['tp'], accumulator['fp'], accumulator['fn'])
+        }
+
+class MultiLabelClassificationTask(Task):
+
+    def __init__(self, cfg):
+        self.type = 'multiLabelClassification'
+        self.cfg = cfg
+
+    def loss(self, prediction, gt):
+        gt = torch.reshape(gt, (gt.shape[0], gt.shape[1], 1, 1))
+        m = nn.Sigmoid()
+        loss = nn.BCELoss()
+        return loss(m(prediction), gt)
+
+    def log_visualize(self, prediction, gt, loss, writer, steps):
+        writer.add_scalar('loss/seg', loss.data.item(), steps)
+        
+    def accumulate_metric(self, prediction, gt, accumulator, distributed=False):
+        m = nn.Sigmoid()
+        preds_classes = torch.round(m(prediction).reshape((prediction.shape[0],prediction.shape[1])))
+        correct = (preds_classes == gt).float().sum()
+        accumulator['correct_predictions'] = accumulator.get('correct_predictions', 0.) + correct
+        accumulator['total'] = accumulator.get('total', 0.) + gt.shape[0] * gt.shape[1]
         tp, fp, fn = get_tp_fp_fn(preds_classes, gt)
         accumulator['tp'] = accumulator.get('tp', 0) + tp
         accumulator['fp'] = accumulator.get('fp', 0) + fp

@@ -105,8 +105,7 @@ def main():
         else:
             base_params.append(v)
     
-    if not cfg.MODEL.SINGLETASK and not cfg.MODEL.SHAREDFEATURE:
-        print(len(nddr_params), len(fc8_weights), len(fc8_bias))
+    # if not cfg.MODEL.SINGLETASK and not cfg.MODEL.SHAREDFEATURE:
         # assert len(nddr_params) > 0 and len(fc8_weights) > 0 and len(fc8_bias) > 0
 
     parameter_dict = [
@@ -140,6 +139,8 @@ def main():
     if cfg.TRAIN.APEX:
         model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
 
+    printf(model.net1, model.net2)
+    
     train_loss1 = []; train_loss2 = []
     valid_loss1 = []; valid_loss2 = []
     counts = []
@@ -160,7 +161,6 @@ def main():
             loss2 = result.loss2
 
             loss = result.loss
-            # print(loss)
             # Mixed Precision
             if cfg.TRAIN.APEX:
                 with amp.scale_loss(loss, optimizer) as scaled_loss:
@@ -187,6 +187,7 @@ def main():
                     result_test = model.loss(image_test, (label_1_test, label_2_test))
                     model.train()
                     valid_loss1.append(result_test.loss1.data.item()); valid_loss2.append(result_test.loss2.data.item())
+
                 counts.append(steps)
                 train_loss1.append(loss1.data.item()); train_loss2.append(loss2.data.item())
                 # Log to tensorboard

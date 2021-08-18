@@ -43,7 +43,6 @@ import torch
 
 class TUTDataset(Dataset):
   def __init__(self, csv1, train, test, clip=None, csv2=None):
-    print(csv2)
     self.csv1 = csv1
     self.csv2 = csv2
     self.train = train
@@ -56,7 +55,6 @@ class TUTDataset(Dataset):
     # should replace hardcoded numbers
     labels1_index = [x for x in range(6,31)]
     labels2_index = [x for x in range(2,6)]
-    # print(self.csv2)
     if self.csv2 is not None:
         self.set_frame_labels()
 
@@ -85,7 +83,6 @@ class TUTDataset(Dataset):
         targets1 = self.all_labels1[index]
     else:
         targets1 = self.all_labels_frame[self.all_sound_names[index]]
-    # librosa.display.specshow(feature, sr=44100)
     if(torch.tensor(targets1, dtype=torch.float32).shape[0] == 1000):
         print(self.all_sound_names[index])
     

@@ -56,14 +56,14 @@ def get_dataset(cfg, mode):
         if mode == 'val' or mode == 'test':
             # print('aici')
             csv1 = pd.read_csv('meta_eval' + clip + '.csv')
-            if cfg.FRAME:
+            if cfg.MODEL.BACKBONE == 'Event_Scene':
                 csv2 = pd.read_csv('meta_eval' + clip + '_frame' '.csv', index_col=0)
                 return TUTDataset(csv1, False, True, clip, csv2)
             else:
                 return TUTDataset(csv1, False, True, clip)
         else:
             csv1 = pd.read_csv('meta' + clip + '.csv')
-            if cfg.FRAME:
+            if cfg.MODEL.BACKBONE == 'Event_Scene':
                 csv2 = pd.read_csv('meta' + clip + '_frame' '.csv', index_col=0)
                 return TUTDataset(csv1, True, False, clip, csv2)
             else:

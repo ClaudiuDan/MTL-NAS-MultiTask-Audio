@@ -233,7 +233,8 @@ def main():
 
     model.train()
     steps = 0
-    test_iter = iter(test_loader)
+    if cfg.TRAIN.EVAL_CKPT:
+        test_iter = iter(test_loader)
 
     while steps < cfg.TRAIN.STEPS:
         # Initialize train/val dataloader below this shuffle operation
@@ -330,14 +331,16 @@ def main():
                            100. * batch_idx / len(train_loader), loss.data.item(),
                     loss1.data.item(), loss2.data.item()))
 
-                image_test, label_1_test, label_2_test = test_iter.next()
-                if cfg.CUDA:
-                    image_test, label_1_test, label_2_test = image_test.cuda(), label_1_test.cuda(), label_2_test.cuda()
-                model.eval()
-                result_test = model.loss(image_test, (label_1_test, label_2_test))
-                model.train()
+                if cfg.TRAIN.EVAL_CKPT:
+                    image_test, label_1_test, label_2_test = test_iter.next()
+                    if cfg.CUDA:
+                        image_test, label_1_test, label_2_test = image_test.cuda(), label_1_test.cuda(), label_2_test.cuda()
+                    model.eval()
+                    result_test = model.loss(image_test, (label_1_test, label_2_test))
+                    model.train()
+                    valid_loss1.append(result_test.loss1.data.item()); valid_loss2.append(result_test.loss2.data.item())
+                    
                 train_loss1.append(loss1.data.item()); train_loss2.append(loss2.data.item())
-                valid_loss1.append(result_test.loss1.data.item()); valid_loss2.append(result_test.loss2.data.item())
                 counts.append(steps)
                 
                 # Log to tensorboard

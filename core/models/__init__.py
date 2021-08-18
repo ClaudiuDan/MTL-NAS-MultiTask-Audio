@@ -26,8 +26,10 @@ def depth_limited_connectivity_matrix(stage_config, limit=3):
 
 
 def vgg_connectivity():
-    return depth_limited_connectivity_matrix([3, 2, 2])
+    return depth_limited_connectivity_matrix([1, 4, 2])
 
+def event_scene_connectivity():
+    return depth_limited_connectivity_matrix([3, 2, 2])
 
 def get_model(cfg, task1, task2):
     if cfg.TASK == 'pixel' or cfg.TASK == 'audio':
@@ -36,16 +38,17 @@ def get_model(cfg, task1, task2):
             net1 = DeepLabLargeFOVBN(1, cfg.MODEL.NET1_CLASSES, weights='')
             net2 = DeepLabLargeFOVBN(1, cfg.MODEL.NET2_CLASSES, weights='')
         elif cfg.MODEL.BACKBONE == 'VGG16_13_Stage':
+            net1 = DeepLabLargeFOVBN16(1, cfg.MODEL.NET1_CLASSES, weights='')
+            net2 = DeepLabLargeFOVBN16(1, cfg.MODEL.NET2_CLASSES, weights='')
+        else:
             net1 = EventBranch(1, cfg.MODEL.NET1_CLASSES, weights='')
             net2 = SceneBranch(1, cfg.MODEL.NET2_CLASSES, weights='')
-        else:
-            raise NotImplementedError
-        
+    print(net1, net2)
     if cfg.ARCH.SEARCHSPACE == 'GeneralizedMTLNAS':
         if cfg.MODEL.BACKBONE == 'VGG16_13_Stage':
             connectivity = vgg_connectivity
         else:
-            raise NotImplementedError
+            connectivity = event_scene_connectivity
         
         model = GeneralizedMTLNASNet(cfg, net1, net2,
                                      net1_connectivity_matrix=connectivity(),

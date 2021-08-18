@@ -8,7 +8,6 @@ _C = CN()
 #########################################################################################
 _C.TASK = 'audio' # pixel (segmentation & normal) vs. image (classification)
 _C.TYPE = '_10Kms'
-_C.FRAME = True
 _C.DATASET = 'nyu_v2'  # or 'taskonomy'
 
 _C.LOG_DIR = 'run'  # Tensorboard log directory
@@ -28,6 +27,7 @@ _C.MODEL.SUPERNET = False
 
 # Parameter for NAS
 _C.MODEL.BACKBONE = 'VGG16_13_Stage'
+# _C.MODEL.BACKBONE = 'Event_Scene'
 
 _C.MODEL.INIT = (0.9, 0.1)
 
@@ -100,7 +100,7 @@ _C.TRAIN.OUTPUT_SIZE = (100, 100)
 _C.TRAIN.WEIGHT_1 = 'DeepLab'
 _C.TRAIN.WEIGHT_2 = 'DeepLab'
 
-_C.TRAIN.BATCH_SIZE = 8
+_C.TRAIN.BATCH_SIZE = 4
 _C.TRAIN.STEPS = 501
 _C.TRAIN.WARMUP = 0
 _C.TRAIN.LR = 0.0001
@@ -128,6 +128,6 @@ _C.TEST.RANDOM_SCALE = False
 _C.TEST.RANDOM_MIRROR = False
 _C.TEST.RANDOM_CROP = False
 
-_C.TEST.BATCH_SIZE = 8
+_C.TEST.BATCH_SIZE = 4
 
 _C.TEST.CKPT_ID = 20000
