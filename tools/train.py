@@ -139,7 +139,7 @@ def main():
     if cfg.TRAIN.APEX:
         model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
 
-    printf(model.net1, model.net2)
+    printf(model.net1.stages, model.net1.head, model.net2.stages, model.net2.head)
     
     train_loss1 = []; train_loss2 = []
     valid_loss1 = []; valid_loss2 = []

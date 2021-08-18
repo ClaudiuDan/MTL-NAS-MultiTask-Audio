@@ -15,6 +15,8 @@ def get_tasks(cfg):
         if cfg.DATASET == 'nyu_v2':
             return SegTask(cfg), NormalTask(cfg)
     if cfg.TASK == 'audio':
+        if cfg.MODEL.BACKBONE == 'Event_Scene':
+            return MultiLabelFrameClassificationTask(cfg), SingleLabelClassificationTask(cfg)
         return MultiLabelClassificationTask(cfg), SingleLabelClassificationTask(cfg)
     
 def get_tp_fp_fn(preds, gts):

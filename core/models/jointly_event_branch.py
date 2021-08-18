@@ -49,7 +49,7 @@ class EventBranch(nn.Module):
                 nn.ReLU(inplace=True)
             ]),
             (64, [
-                nn.MaxPool2d((4, 1)),
+                nn.MaxPool2d((2, 1)),
                 nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
                 nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
                 nn.ReLU(inplace=True)
@@ -83,7 +83,7 @@ class EventBranch(nn.Module):
 
         head = [
             Reshape1(),
-            nn.GRU(128, 64, 1, bidirectional=True),
+            nn.GRU(256, 64, 1, bidirectional=True),
             Reshape2(),
             nn.Linear(64 * 2, 32),
             nn.ReLU(),

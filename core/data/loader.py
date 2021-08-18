@@ -83,8 +83,6 @@ class TUTDataset(Dataset):
         targets1 = self.all_labels1[index]
     else:
         targets1 = self.all_labels_frame[self.all_sound_names[index]]
-    if(torch.tensor(targets1, dtype=torch.float32).shape[0] == 1000):
-        print(self.all_sound_names[index])
     
     return (torch.tensor(feature, dtype=torch.float32), 
             torch.tensor(targets1, dtype=torch.float32), 

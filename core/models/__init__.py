@@ -43,7 +43,6 @@ def get_model(cfg, task1, task2):
         else:
             net1 = EventBranch(1, cfg.MODEL.NET1_CLASSES, weights='')
             net2 = SceneBranch(1, cfg.MODEL.NET2_CLASSES, weights='')
-    print(net1, net2)
     if cfg.ARCH.SEARCHSPACE == 'GeneralizedMTLNAS':
         if cfg.MODEL.BACKBONE == 'VGG16_13_Stage':
             connectivity = vgg_connectivity

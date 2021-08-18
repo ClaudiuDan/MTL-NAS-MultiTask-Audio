@@ -14,6 +14,7 @@ class Reshape0(torch.nn.Module):
 
 class PrintReshape(torch.nn.Module):
     def forward(self, x):
+        print('\n', x.shape, '\n')
         return x
 
 class SceneBranch(nn.Module):
@@ -45,7 +46,7 @@ class SceneBranch(nn.Module):
                 nn.ReLU(inplace=True)
             ]),
             (64, [
-                nn.MaxPool2d((4, 1)),
+                nn.MaxPool2d((2, 1)),
                 nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
                 nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
                 nn.ReLU(inplace=True)
@@ -82,13 +83,13 @@ class SceneBranch(nn.Module):
             nn.Conv2d(128,256,kernel_size=(3,3),stride=1,padding=(1,1)),
             nn.BatchNorm2d(256),
             nn.ReLU(),
-            nn.MaxPool2d((1, 25)),
+            nn.MaxPool2d((1, 5)),
             nn.Conv2d(256,256,kernel_size=(3,3),stride=1,padding=(1,1)),
             nn.BatchNorm2d(256),
             nn.ReLU(),
-            nn.MaxPool2d((1, 20)),
+            nn.MaxPool2d((1, 10)),
             Reshape(),
-            nn.Linear(256, 32),
+            nn.Linear(512, 32),
             nn.ReLU(),
             nn.Dropout(p=0.15),
             nn.Linear(32,4)
