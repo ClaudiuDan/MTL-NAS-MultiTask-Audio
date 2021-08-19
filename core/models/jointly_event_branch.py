@@ -16,7 +16,6 @@ class Reshape1(torch.nn.Module):
 
 class Reshape2(torch.nn.Module):
     def forward(self, x):
-        # print(x[0].shape, x[0].permute(1, 0, 2).shape)
         return x[0].permute(1, 0, 2)
         
 

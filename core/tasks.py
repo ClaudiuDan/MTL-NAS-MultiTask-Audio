@@ -24,7 +24,21 @@ def get_tp_fp_fn(preds, gts):
     tp = ((preds == 1) & (gts == 1)).float().sum()
     fp = ((preds == 1) & (gts == 0)).float().sum()
     fn = ((preds == 0) & (gts == 1)).float().sum()
-    return tp, fp, fn
+    # TODO: not sure if this is correct
+    n = (gts == 1).float().sum()
+    return tp, fp, fn, n 
+
+def get_tp_fp_fn_framed(preds, gts):
+    preds_new = preds.permute(1, 0, 2)
+    gts_new = gts.permute(1, 0, 2)
+    tps = []; fps = []; fns = []; ns = []
+    for pred, gt in zip(preds_new, gts_new):
+        tp, fp, fn, n = get_tp_fp_fn(pred, gt)
+        tps.append(tp)
+        fps.append(fp)
+        fns.append(fn)
+        ns.append(n)
+    return tps, fps, fns, ns 
 
 def get_f_score(tp, fp, fn):
     if tp + fp == 0:
@@ -32,6 +46,88 @@ def get_f_score(tp, fp, fn):
     precision = tp / (tp + fp)
     recall = tp / (tp + fn)
     return 2 * precision * recall / (precision + recall)
+
+
+def get_event_error_rate(preds, gts):
+    error_rate = 0
+    for batch_pred, batch_gt in zip(preds, gts):
+        ss = 0; sd = 0; si = 0; sn = 0
+        for pred, gt in zip(batch_pred, batch_gt):
+            _, fp, fn, n = get_tp_fp_fn(pred, gt)
+            s_k = min(fp, fn)
+            d_k = max(0, fn - fp)
+            i_k = max(0, fp - fn)
+            ss += s_k
+            sd += d_k
+            si += i_k
+            sn += n
+        error_rate += (ss + sd + si) / sn
+    return error_rate / preds.shape[0]
+
+def get_event_error_rate_batched(preds, gts):
+    preds_new = preds.permute(1, 0, 2)
+    gts_new = gts.permute(1, 0, 2)
+    ss = 0; sd = 0; si = 0; sn = 0
+    for pred, gt in zip(preds_new, gts_new):
+        _, fp, fn, n = get_tp_fp_fn(pred, gt)
+        s_k = min(fp, fn)
+        d_k = max(0, fn - fp)
+        i_k = max(0, fp - fn)
+        ss += s_k
+        sd += d_k
+        si += i_k
+        sn += n
+    return (ss + sd + si) / sn 
+
+def get_error_rate_global(fps, fns, ns):
+    ss = 0; sd = 0; si = 0; sn = 0
+    for fp, fn, n in zip(fps, fns, ns):
+        s_k = min(fp, fn)
+        d_k = max(0, fn - fp)
+        i_k = max(0, fp - fn)
+        ss += s_k
+        sd += d_k
+        si += i_k
+        sn += n
+    print(ss, sd, si, sn)
+    return (ss + sd + si) / sn 
+
+
+def get_segment_error_rate(preds, gts):
+    error_rate = 0
+    for batch_pred, batch_gt in zip(preds, gts):
+        ss = 0; sd = 0; si = 0; sn = 0
+        _, fp, fn, n = get_tp_fp_fn(batch_pred, batch_gt)
+        s_k = min(fp, fn)
+        d_k = max(0, fn - fp)
+        i_k = max(0, fp - fn)
+        ss += s_k
+        sd += d_k
+        si += i_k
+        sn += n
+        error_rate += (ss + sd + si) / sn
+    return error_rate / preds.shape[0]
+
+def get_segment_error_rate_batched(preds, gts):
+    preds_new = preds.permute(1, 0, 2)
+    gts_new = gts.permute(1, 0, 2)
+    for batch_pred, batch_gt in zip(preds_new, gts_new):
+        ss = 0; sd = 0; si = 0; sn = 0
+        _, fp, fn, n = get_tp_fp_fn(batch_pred, batch_gt)
+        s_k = min(fp, fn)
+        d_k = max(0, fn - fp)
+        i_k = max(0, fp - fn)
+        ss += s_k
+        sd += d_k
+        si += i_k
+        sn += n
+    return (ss + sd + si) / sn
+    
+def get_segment_error_rate_global(fp, fn, n):
+    s_k = min(fp, fn)
+    d_k = max(0, fn - fp)
+    i_k = max(0, fp - fn)
+    return (s_k + d_k + i_k) / n
 
 class Task:
     
@@ -75,7 +171,7 @@ class SingleLabelClassificationTask(Task):
         correct = (preds_classes == gt).float().sum()
         accumulator['correct_predictions'] = accumulator.get('correct_predictions', 0.) + correct
         accumulator['total'] = accumulator.get('total', 0.) + gt.shape[0] * gt.shape[1]
-        tp, fp, fn = get_tp_fp_fn(preds_classes, gt)
+        tp, fp, fn,_ = get_tp_fp_fn(preds_classes, gt)
         accumulator['tp'] = accumulator.get('tp', 0) + tp
         accumulator['fp'] = accumulator.get('fp', 0) + fp
         accumulator['fn'] = accumulator.get('fn', 0) + fn
@@ -108,17 +204,22 @@ class MultiLabelFrameClassificationTask(Task):
         correct = (preds_classes == gt).float().sum()
         accumulator['correct_predictions'] = accumulator.get('correct_predictions', 0.) + correct
         accumulator['total'] = accumulator.get('total', 0.) + gt.shape[0] * gt.shape[1] * gt.shape[2]
-        tp, fp, fn = get_tp_fp_fn(preds_classes, gt)
+        _, fps, fns, ns = get_tp_fp_fn_framed(preds_classes, gt)
+        tp, fp, fn, n = get_tp_fp_fn(preds_classes, gt)
         accumulator['tp'] = accumulator.get('tp', 0) + tp
         accumulator['fp'] = accumulator.get('fp', 0) + fp
         accumulator['fn'] = accumulator.get('fn', 0) + fn
+        accumulator['fps'] = [sum(x) for x in zip(fps, accumulator.get('fps', np.zeros(len(ns)).tolist()))]
+        accumulator['fns'] = [sum(x) for x in zip(fns, accumulator.get('fns', np.zeros(len(ns)).tolist()))]
+        accumulator['ns'] = [sum(x) for x in zip(ns, accumulator.get('ns', np.zeros(len(ns)).tolist()))]
         return accumulator
 
     def aggregate_metric(self, accumulator):
         acc = accumulator['correct_predictions'] / accumulator['total']
         return {
             'Accuracy (TASK 1)' : acc,
-            'F-Score (TASK 1)' : get_f_score(accumulator['tp'], accumulator['fp'], accumulator['fn'])
+            'F-Score (TASK 1)' : get_f_score(accumulator['tp'], accumulator['fp'], accumulator['fn']),
+            'Error-Rate Global (TASK 1)': get_error_rate_global(accumulator['fps'], accumulator['fns'], accumulator['ns'])
         }
 
 class MultiLabelClassificationTask(Task):
@@ -142,17 +243,19 @@ class MultiLabelClassificationTask(Task):
         correct = (preds_classes == gt).float().sum()
         accumulator['correct_predictions'] = accumulator.get('correct_predictions', 0.) + correct
         accumulator['total'] = accumulator.get('total', 0.) + gt.shape[0] * gt.shape[1]
-        tp, fp, fn = get_tp_fp_fn(preds_classes, gt)
+        tp, fp, fn, n = get_tp_fp_fn(preds_classes, gt)
         accumulator['tp'] = accumulator.get('tp', 0) + tp
         accumulator['fp'] = accumulator.get('fp', 0) + fp
         accumulator['fn'] = accumulator.get('fn', 0) + fn
+        accumulator['n'] = accumulator.get('n', 0) + n
         return accumulator
 
     def aggregate_metric(self, accumulator):
         acc = accumulator['correct_predictions'] / accumulator['total']
         return {
             'Accuracy (TASK 1)' : acc,
-            'F-Score (TASK 1)' : get_f_score(accumulator['tp'], accumulator['fp'], accumulator['fn'])
+            'F-Score (TASK 1)' : get_f_score(accumulator['tp'], accumulator['fp'], accumulator['fn']),
+            'Error-Rate global (TASK 1)' : get_segment_error_rate_global(accumulator['fp'], accumulator['fn'], accumulator['n'])
         }
 
 class SegTask(Task):
