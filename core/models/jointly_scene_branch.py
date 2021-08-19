@@ -87,7 +87,6 @@ class SceneBranch(nn.Module):
             nn.Conv2d(256,256,kernel_size=(3,3),stride=1,padding=(1,1)),
             nn.BatchNorm2d(256),
             nn.ReLU(),
-            nn.MaxPool2d((1, 10)),
             Reshape(),
             nn.Linear(512, 32),
             nn.ReLU(),

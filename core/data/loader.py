@@ -72,7 +72,6 @@ class TUTDataset(Dataset):
         split_name = line[0][0:index]
         self.all_labels_frame[split_name].append(line[1:26].to_numpy())
 
-
   def __len__(self):
     return len(self.all_sound_names)
 

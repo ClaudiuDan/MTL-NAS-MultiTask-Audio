@@ -7,7 +7,7 @@ _C = CN()
 # General Parameters
 #########################################################################################
 _C.TASK = 'audio' # pixel (segmentation & normal) vs. image (classification)
-_C.TYPE = '_1000ms'
+_C.TYPE = '_100ms'
 _C.DATASET = 'nyu_v2'  # or 'taskonomy'
 
 _C.LOG_DIR = 'run'  # Tensorboard log directory
@@ -60,7 +60,6 @@ _C.ARCH.WEIGHT_DECAY = 1e-3
 _C.ARCH.INIT_TEMP = 1.
 _C.ARCH.TEMPERATURE_POWER = 2.
 _C.ARCH.TEMPERATURE_PERIOD = (0., 1.)
-
 # For regularization
 _C.ARCH.ENTROPY_REGULARIZATION = False
 _C.ARCH.ENTROPY_PERIOD = (0., 1.)  # proportion of training with regularization
@@ -103,20 +102,20 @@ _C.TRAIN.WEIGHT_2 = 'DeepLab'
 _C.TRAIN.BATCH_SIZE = 16
 _C.TRAIN.STEPS = 501
 _C.TRAIN.WARMUP = 0
-_C.TRAIN.LR = 0.0001
+_C.TRAIN.LR = 0.01
 _C.TRAIN.MOMENTUM = 0.9
 _C.TRAIN.WEIGHT_DECAY = 2.5e-4
 _C.TRAIN.POWER = 0.9
 _C.TRAIN.NDDR_FACTOR = 100.
 _C.TRAIN.FC8_WEIGHT_FACTOR = 10.
 _C.TRAIN.FC8_BIAS_FACTOR = 20.
-_C.TRAIN.TASK2_FACTOR = 5.  # 20. for normal
+_C.TRAIN.TASK2_FACTOR = 1.  # 20. for normal
 _C.TRAIN.SCHEDULE = 'Poly'
 
 _C.TRAIN.LOG_INTERVAL = 5
 _C.TRAIN.EVAL_INTERVAL = 100
 _C.TRAIN.SAVE_INTERVAL = 100
-_C.TRAIN.EVAL_CKPT = False
+_C.TRAIN.EVAL_CKPT = True
 
 
 #########################################################################################
