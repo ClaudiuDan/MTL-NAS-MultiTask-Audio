@@ -89,7 +89,6 @@ def get_error_rate_global(fps, fns, ns):
         sd += d_k
         si += i_k
         sn += n
-    print(ss, sd, si, sn)
     return (ss + sd + si) / sn 
 
 

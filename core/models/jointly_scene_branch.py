@@ -12,10 +12,26 @@ class Reshape0(torch.nn.Module):
     def forward(self, x):
         return x.permute(0, 1, 3, 2)
 
-class PrintReshape(torch.nn.Module):
+class MaxpoolIf1(torch.nn.Module):
     def forward(self, x):
-        print('\n', x.shape, '\n')
-        return x
+        f = None
+        if cfg.TYPE == '_10Kms':
+            f = nn.MaxPool2d((1, 25))
+        if cfg.TYPE == '_1000ms':
+            f = nn.MaxPool2d((1, 5))
+        if cfg.TYPE == '_100ms':
+            f = nn.MaxPool2d((1, 5))
+        return f(x)
+
+class MaxpoolIf2(torch.nn.Module):
+    def forward(self, x):
+        if cfg.TYPE == '_10Kms':
+            f = nn.MaxPool2d((1, 25))
+        if cfg.TYPE == '_1000ms':
+            f = nn.MaxPool2d((1, 10))
+        if cfg.TYPE == '_100ms':
+            f = lambda x : x
+        return f(x)
 
 class SceneBranch(nn.Module):
     def __init__(self, in_dim, out_dim, weights='DeepLab', *args, **kwargs):
@@ -83,10 +99,11 @@ class SceneBranch(nn.Module):
             nn.Conv2d(128,256,kernel_size=(3,3),stride=1,padding=(1,1)),
             nn.BatchNorm2d(256),
             nn.ReLU(),
-            nn.MaxPool2d((1, 5)),
+            MaxpoolIf1(),
             nn.Conv2d(256,256,kernel_size=(3,3),stride=1,padding=(1,1)),
             nn.BatchNorm2d(256),
             nn.ReLU(),
+            MaxpoolIf2(),
             Reshape(),
             nn.Linear(512, 32),
             nn.ReLU(),

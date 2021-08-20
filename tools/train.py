@@ -143,6 +143,8 @@ def main():
     
     train_loss1 = []; train_loss2 = []
     valid_loss1 = []; valid_loss2 = []
+    train_loss = []; valid_loss = []
+
     counts = []
     model.train()
     steps = 0
@@ -187,9 +189,12 @@ def main():
                     result_test = model.loss(image_test, (label_1_test, label_2_test))
                     model.train()
                     valid_loss1.append(result_test.loss1.data.item()); valid_loss2.append(result_test.loss2.data.item())
+                    valid_loss.append(result_test.loss.data.item())
 
                 counts.append(steps)
                 train_loss1.append(loss1.data.item()); train_loss2.append(loss2.data.item())
+                train_loss.append(loss.data.item())
+
                 # Log to tensorboard
                 # commented because of some errors
                 # writer.add_scalar('lr', scheduler.get_lr()[0], steps)
@@ -239,7 +244,7 @@ def main():
     loss_path = os.path.join(experiment_log_dir, 'loss')
     if not os.path.isdir(loss_path):
         os.makedirs(loss_path)
-    save_loss_plots(train_loss1, train_loss2, valid_loss1, valid_loss2, counts, loss_path)
+    save_loss_plots(train_loss1, train_loss2, valid_loss1, valid_loss2, train_loss, valid_loss, counts, loss_path)
 
 if __name__ == '__main__':
     main()

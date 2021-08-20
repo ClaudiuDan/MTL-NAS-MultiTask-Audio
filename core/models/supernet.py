@@ -54,7 +54,6 @@ class GeneralizedMTLNASNet(nn.Module):
 
         self.net1_alphas = nn.Parameter(torch.zeros(net1_connectivity_matrix.shape))
         self.net2_alphas = nn.Parameter(torch.zeros(net2_connectivity_matrix.shape))
-
         self.paths = nn.ModuleDict({
             'net1_paths': net1_fusion_ops,
             'net2_paths': net2_fusion_ops,

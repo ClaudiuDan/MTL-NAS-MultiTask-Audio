@@ -230,6 +230,7 @@ def main():
     printf(model.net1.stages, model.net1.head, model.net2.stages, model.net2.head)
     train_loss1 = []; train_loss2 = []
     valid_loss1 = []; valid_loss2 = []
+    train_loss = []; valid_loss = []
     counts = []
 
     model.train()
@@ -340,8 +341,10 @@ def main():
                     result_test = model.loss(image_test, (label_1_test, label_2_test))
                     model.train()
                     valid_loss1.append(result_test.loss1.data.item()); valid_loss2.append(result_test.loss2.data.item())
+                    valid_loss.append(result_test.loss.data.item())
                     
                 train_loss1.append(loss1.data.item()); train_loss2.append(loss2.data.item())
+                train_loss.append(loss.data.item())
                 counts.append(steps)
                 
                 # Log to tensorboard
@@ -374,8 +377,8 @@ def main():
                     alpha2_path = os.path.join(experiment_log_dir, 'alpha2')
                     if not os.path.isdir(alpha2_path):
                         os.makedirs(alpha2_path)
-                    heatmap1 = save_heatmap(alpha1, os.path.join(alpha1_path, "%s_alpha1.png"%str(steps).zfill(5)))
-                    heatmap2 = save_heatmap(alpha2, os.path.join(alpha2_path, "%s_alpha2.png"%str(steps).zfill(5)))
+                    heatmap1 = save_heatmap(alpha1, os.path.join(alpha1_path, "%s_alpha1.png"%str(steps).zfill(5)), '1')
+                    heatmap2 = save_heatmap(alpha2, os.path.join(alpha2_path, "%s_alpha2.png"%str(steps).zfill(5)), '2')
                     writer.add_image('alpha/net1', heatmap1, steps)
                     writer.add_image('alpha/net2', heatmap2, steps)
                     network_path = os.path.join(experiment_log_dir, 'network')
@@ -439,7 +442,7 @@ def main():
     loss_path = os.path.join(experiment_log_dir, 'loss')
     if not os.path.isdir(loss_path):
         os.makedirs(loss_path)
-    save_loss_plots(train_loss1, train_loss2, valid_loss1, valid_loss2, counts, loss_path)
+    save_loss_plots(train_loss1, train_loss2, valid_loss1, valid_loss2, train_loss, valid_loss, counts, loss_path)
 
 if __name__ == '__main__':
     main()

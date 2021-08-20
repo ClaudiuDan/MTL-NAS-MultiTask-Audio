@@ -57,32 +57,50 @@ def process_normal_label(pred, gt, ignore_label):
     return pred, gt
 
 
-def save_heatmap(matrix, filename, vmin=0., vmax=1.):
-    fig = plt.figure(0)
+def save_heatmap(matrix, filename, task, vmin=0., vmax=1):
+    fig= plt.figure(0)
     fig.clf()
+    axes = fig.gca()
     plt.matshow(matrix, fignum=0, cmap=plt.cm.bwr, vmin=vmin, vmax=vmax)
     plt.colorbar()
+    if task == '1':
+        axes.set_xlabel('Task 1 (event) nodes\' indices')
+        axes.set_ylabel('Task 2 (scene) nodes\' indices')
+    else:
+        axes.set_ylabel('Task 1 (event) nodes\' indices')
+        axes.set_xlabel('Task 2 (scene) nodes\' indices')
     plt.savefig(filename)
     img = Image.open(filename)
     return np.array(img).transpose((2, 0, 1))
 
 
-def save_loss_plots(train1, train2, valid1, valid2, counts, filename):
-    plt.figure()
-    plt.subplot(211)
+def save_loss_plots(train1, train2, valid1, valid2, train, valid, counts, filename):
+    plt.figure(figsize=(7, 6))
+
+    plt.subplot(311)
     plt.plot(counts, train1, label='train')
     plt.plot(counts, valid1, label='validation')
     plt.xlabel('Iteration')
     plt.ylabel('Loss')
     plt.title('Event Classification (Task 1)')
     plt.legend()
-    plt.subplot(212)
+
+    plt.subplot(312)
     plt.plot(counts, train2, label='train')
     plt.plot(counts, valid2, label='validation')
     plt.xlabel('Iteration')
     plt.ylabel('Loss')
     plt.title('Scene Classification (Task 2)')
     plt.legend()
+
+    plt.subplot(313)
+    plt.plot(counts, train, label='train')
+    plt.plot(counts, valid, label='validation')
+    plt.xlabel('Iteration')
+    plt.ylabel('Loss')
+    plt.title('Both Tasks (Scene + Event)')
+    plt.legend()
+
     plt.tight_layout()
     plt.savefig(filename + '/loss')
 
@@ -190,16 +208,23 @@ def save_connectivity(net1, net2, connectivity1, connectivity2, filename, align=
     figsize = (1.5, num_stages / 2.) if align == 'vertical' else (num_stages / 2., 1.5)
     fig = plt.figure(num=0, figsize=figsize)
     fig.clf()
-
+    ax = plt.gca()
+    ax.set_title('Task 2 branch (scene)', fontsize=18)
+    ax.text(0, -1, "Task 1 branch (event)", ha="center", fontsize=18)
     labels = {n: d['label'] for n, d in G.nodes(data=True)}
     node_color = [d['color'] for _, d in G.nodes(data=True)]
     edge_color = [d['color'] for _, _, d in G.edges(data=True)]
-    nx.draw(G, pos=pos, labels=labels, node_color=node_color, edge_color=edge_color, with_labels=with_labels)
-    nx.draw_networkx_edges(G, pos=pos, edgelist=pos_edges, edge_color='xkcd:violet')
-    arcs = nx.draw_networkx_edges(G, pos=pos, edgelist=neg_edges, edge_color='xkcd:silver', alpha=0.3)
+    nx.draw(G, pos=pos, labels=labels, node_color=node_color, edge_color=edge_color, with_labels=with_labels, ax=ax)
+    nx.draw_networkx_edges(G, pos=pos, edgelist=pos_edges, edge_color='xkcd:violet', ax=ax)
+    arcs = nx.draw_networkx_edges(G, pos=pos, edgelist=neg_edges, edge_color='xkcd:silver', alpha=0.3, ax=ax)
     if arcs != None:
         for arc in arcs:
             arc.set_linestyle('dotted')
+    # plt.title('Task 1 branch', fontsize=18)
+    # plt.xlabel('Task 2 branch', fontsize=18)
+    # plt.legend()
+    _ = ax.axis('off')
     plt.savefig(filename)
+    
     img = Image.open(filename)
     return np.array(img).transpose((2, 0, 1))
