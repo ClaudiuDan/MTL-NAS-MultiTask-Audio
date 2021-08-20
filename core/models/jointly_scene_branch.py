@@ -26,7 +26,7 @@ class MaxpoolIf1(torch.nn.Module):
 class MaxpoolIf2(torch.nn.Module):
     def forward(self, x):
         if cfg.TYPE == '_10Kms':
-            f = nn.MaxPool2d((1, 25))
+            f = nn.MaxPool2d((1, 20))
         if cfg.TYPE == '_1000ms':
             f = nn.MaxPool2d((1, 10))
         if cfg.TYPE == '_100ms':
