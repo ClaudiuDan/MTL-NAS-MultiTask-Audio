@@ -221,6 +221,7 @@ def main():
                 if cfg.TRAIN.EVAL_CKPT:
                     model.eval()
                     task1_metric, task2_metric = evaluate(test_loader, model, task1, task2)
+                    printf('\n')
                     for k, v in task1_metric.items():
                         writer.add_scalar('eval/{}'.format(k), v, steps)
                     for k, v in task2_metric.items():

@@ -415,8 +415,8 @@ def main():
                     model.eval()
                     torch.cuda.empty_cache()  # TODO check if it helps
                     task1_metric, task2_metric = evaluate(test_loader, model, task1, task2, distributed, args.local_rank)
-
                     if logging:
+                        printf('\n')
                         for k, v in task1_metric.items():
                             writer.add_scalar('eval/{}'.format(k), v, steps)
                         for k, v in task2_metric.items():

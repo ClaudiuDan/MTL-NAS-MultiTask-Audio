@@ -7,7 +7,7 @@ _C = CN()
 # General Parameters
 #########################################################################################
 _C.TASK = 'audio' # pixel (segmentation & normal) vs. image (classification)
-_C.TYPE = '_10Kms'
+_C.TYPE = '_100ms'
 _C.DATASET = 'nyu_v2'  # or 'taskonomy'
 
 _C.LOG_DIR = 'run'  # Tensorboard log directory
