@@ -47,6 +47,14 @@ def get_f_score(tp, fp, fn):
     recall = tp / (tp + fn)
     return 2 * precision * recall / (precision + recall)
 
+def get_f_score_framed(tps, fps, fns):
+    tp = np.sum(tps); fp = np.sum(fps); fn = np.sum(fns)
+    if tp + fp == 0:
+        print(tps)
+        return 0
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    return 2 * precision * recall / (precision + recall)
 
 def get_event_error_rate(preds, gts):
     error_rate = 0
@@ -203,11 +211,12 @@ class MultiLabelFrameClassificationTask(Task):
         correct = (preds_classes == gt).float().sum()
         accumulator['correct_predictions'] = accumulator.get('correct_predictions', 0.) + correct
         accumulator['total'] = accumulator.get('total', 0.) + gt.shape[0] * gt.shape[1] * gt.shape[2]
-        _, fps, fns, ns = get_tp_fp_fn_framed(preds_classes, gt)
-        tp, fp, fn, n = get_tp_fp_fn(preds_classes, gt)
-        accumulator['tp'] = accumulator.get('tp', 0) + tp
-        accumulator['fp'] = accumulator.get('fp', 0) + fp
-        accumulator['fn'] = accumulator.get('fn', 0) + fn
+        tps, fps, fns, ns = get_tp_fp_fn_framed(preds_classes, gt)
+        # tp, fp, fn, n = get_tp_fp_fn(preds_classes, gt)
+        # accumulator['tp'] = accumulator.get('tp', 0) + tp
+        # accumulator['fp'] = accumulator.get('fp', 0) + fp
+        # accumulator['fn'] = accumulator.get('fn', 0) + fn
+        accumulator['tps'] = [sum(x) for x in zip(tps, accumulator.get('tps', np.zeros(len(ns)).tolist()))]
         accumulator['fps'] = [sum(x) for x in zip(fps, accumulator.get('fps', np.zeros(len(ns)).tolist()))]
         accumulator['fns'] = [sum(x) for x in zip(fns, accumulator.get('fns', np.zeros(len(ns)).tolist()))]
         accumulator['ns'] = [sum(x) for x in zip(ns, accumulator.get('ns', np.zeros(len(ns)).tolist()))]
@@ -217,7 +226,7 @@ class MultiLabelFrameClassificationTask(Task):
         acc = accumulator['correct_predictions'] / accumulator['total']
         return {
             'Accuracy (TASK 1)' : acc,
-            'F-Score (TASK 1)' : get_f_score(accumulator['tp'], accumulator['fp'], accumulator['fn']),
+            'F-Score (TASK 1)' : get_f_score_framed(accumulator['tps'], accumulator['fps'], accumulator['fns']),
             'Error-Rate Global (TASK 1)': get_error_rate_global(accumulator['fps'], accumulator['fns'], accumulator['ns'])
         }
 
