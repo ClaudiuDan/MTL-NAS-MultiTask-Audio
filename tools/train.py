@@ -182,7 +182,13 @@ def main():
                     loss1.data.item(), loss2.data.item()))
 
                 if cfg.TRAIN.EVAL_CKPT:
-                    image_test, label_1_test, label_2_test = test_iter.next()
+                    try:
+                        image_test, label_1_test, label_2_test = test_iter.next()
+                    except StopIteration:
+                        test_iter = iter(test_loader)
+                        image_test, label_1_test, label_2_test = test_iter.next()
+
+
                     if cfg.CUDA:
                         image_test, label_1_test, label_2_test = image_test.cuda(), label_1_test.cuda(), label_2_test.cuda()
                     model.eval()

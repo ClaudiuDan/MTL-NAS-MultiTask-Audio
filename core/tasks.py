@@ -34,10 +34,10 @@ def get_tp_fp_fn_framed(preds, gts):
     tps = []; fps = []; fns = []; ns = []
     for pred, gt in zip(preds_new, gts_new):
         tp, fp, fn, n = get_tp_fp_fn(pred, gt)
-        tps.append(tp)
-        fps.append(fp)
-        fns.append(fn)
-        ns.append(n)
+        tps.append(tp.cpu())
+        fps.append(fp.cpu())
+        fns.append(fn.cpu())
+        ns.append(n.cpu())
     return tps, fps, fns, ns 
 
 def get_f_score(tp, fp, fn):
@@ -48,7 +48,9 @@ def get_f_score(tp, fp, fn):
     return 2 * precision * recall / (precision + recall)
 
 def get_f_score_framed(tps, fps, fns):
-    tp = np.sum(tps); fp = np.sum(fps); fn = np.sum(fns)
+    tp = np.sum(tps)
+    fp = np.sum(fps)
+    fn = np.sum(fns)
     if tp + fp == 0:
         print(tps)
         return 0
