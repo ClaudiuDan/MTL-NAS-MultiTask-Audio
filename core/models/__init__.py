@@ -26,7 +26,7 @@ def depth_limited_connectivity_matrix(stage_config, limit=10):
 
 
 def vgg_connectivity():
-    return depth_limited_connectivity_matrix([1, 4, 2])
+    return depth_limited_connectivity_matrix([1, 2, 1])
 
 def event_scene_connectivity():
     return depth_limited_connectivity_matrix([1, 1, 1])

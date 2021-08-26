@@ -26,7 +26,7 @@ def get_tp_fp_fn(preds, gts):
     fn = ((preds == 0) & (gts == 1)).float().sum()
     # TODO: not sure if this is correct
     n = (gts == 1).float().sum()
-    return tp, fp, fn, n 
+    return tp.cpu(), fp.cpu(), fn.cpu(), n.cpu()
 
 def get_tp_fp_fn_framed(preds, gts):
     preds_new = preds.permute(1, 0, 2)
@@ -34,10 +34,10 @@ def get_tp_fp_fn_framed(preds, gts):
     tps = []; fps = []; fns = []; ns = []
     for pred, gt in zip(preds_new, gts_new):
         tp, fp, fn, n = get_tp_fp_fn(pred, gt)
-        tps.append(tp.cpu())
-        fps.append(fp.cpu())
-        fns.append(fn.cpu())
-        ns.append(n.cpu())
+        tps.append(tp)
+        fps.append(fp)
+        fns.append(fn)
+        ns.append(n)
     return tps, fps, fns, ns 
 
 def get_f_score(tp, fp, fn):
@@ -265,7 +265,7 @@ class MultiLabelClassificationTask(Task):
         return {
             'Accuracy (TASK 1)' : acc,
             'F-Score (TASK 1)' : get_f_score(accumulator['tp'], accumulator['fp'], accumulator['fn']),
-            'Error-Rate global (TASK 1)' : get_segment_error_rate_global(accumulator['fp'], accumulator['fn'], accumulator['n'])
+            'Error-Rate Global (TASK 1)' : get_segment_error_rate_global(accumulator['fp'], accumulator['fn'], accumulator['n'])
         }
 
 class SegTask(Task):

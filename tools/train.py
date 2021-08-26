@@ -284,7 +284,6 @@ def main():
         os.makedirs(scores_path)
     save_task1_plots(f_scores1, accuracies1, errors1, scores_path)
     save_task2_plots(f_scores2, accuracies2, scores_path)
-    print(accuracies1)
 
 if __name__ == '__main__':
     main()

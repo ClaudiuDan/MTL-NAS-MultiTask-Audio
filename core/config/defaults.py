@@ -26,8 +26,8 @@ _C.MODEL.SHAREDFEATURE = False
 _C.MODEL.SUPERNET = False
 
 # Parameter for NAS
-# _C.MODEL.BACKBONE = 'VGG16_13_Stage'
-_C.MODEL.BACKBONE = 'Event_Scene'
+_C.MODEL.BACKBONE = 'VGG16_13_Stage'
+# _C.MODEL.BACKBONE = 'Event_Scene'
 
 _C.MODEL.INIT = (0.9, 0.1)
 

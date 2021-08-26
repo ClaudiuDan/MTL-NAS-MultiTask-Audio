@@ -15,6 +15,7 @@ class DeepLabLargeFOVBN16(nn.Module):
         layers = []
         stages = [
             (64, [
+                nn.MaxPool2d(3, stride=2),
                 nn.Conv2d(in_dim, 64, kernel_size=3, stride=1, padding=1, bias=False),
                 nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
                 nn.ReLU(inplace=True)

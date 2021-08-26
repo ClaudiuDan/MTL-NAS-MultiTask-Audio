@@ -25,7 +25,7 @@ from core.tasks import get_tasks
 from core.models import get_model
 from core.utils import get_print
 from core.utils.losses import entropy_loss, l1_loss
-from core.utils.visualization import process_image, save_heatmap, save_connectivity, save_loss_plots
+from core.utils.visualization import process_image, save_heatmap, save_connectivity, save_loss_plots, save_task1_plots, save_task2_plots
 
 from eval import evaluate
 
@@ -231,6 +231,8 @@ def main():
     train_loss1 = []; train_loss2 = []
     valid_loss1 = []; valid_loss2 = []
     train_loss = []; valid_loss = []
+    f_scores1 = []; accuracies1 = []; errors1 = []
+    f_scores2 = []; accuracies2 = []
     counts = []
 
     model.train()
@@ -420,6 +422,13 @@ def main():
                     model.eval()
                     torch.cuda.empty_cache()  # TODO check if it helps
                     task1_metric, task2_metric = evaluate(test_loader, model, task1, task2, distributed, args.local_rank)
+
+                    f_scores1.append(task1_metric['F-Score (TASK 1)'])
+                    accuracies1.append(task1_metric['Accuracy (TASK 1)'].cpu())
+                    errors1.append(task1_metric['Error-Rate Global (TASK 1)'].cpu())
+                    f_scores2.append(task2_metric['F-Score (TASK 2)'].cpu())
+                    accuracies2.append(task2_metric['Accuracy (TASK 2)'].cpu())
+
                     if logging:
                         printf('\n')
                         for k, v in task1_metric.items():
@@ -430,6 +439,25 @@ def main():
                             printf('{}: {:.3f}'.format(k, v))
                         for k, v in task2_metric.items():
                             printf('{}: {:.3f}'.format(k, v))
+
+                    printf('\n')
+                    printf('Best Scores (depending on TASK 1, F-Score):\n')
+                    index = np.argmax(f_scores1)
+                    printf('{}: {:.3f}'.format('Accuracy (TASK 1)', accuracies1[index]))
+                    printf('{}: {:.3f}'.format('F-Score (TASK 1)', f_scores1[index]))
+                    printf('{}: {:.3f}'.format('Error Rate (TASK 1)', errors1[index]))
+                    printf('{}: {:.3f}'.format('Accuracy (TASK 2)', accuracies2[index]))
+                    printf('{}: {:.3f}'.format('F-Score (TASK 2)', f_scores2[index]))
+
+                    printf('\n')
+                    printf('Best Scores (depending on TASK 2, F-Score):\n')
+                    index = np.argmax(f_scores2)
+                    printf('{}: {:.3f}'.format('Accuracy (TASK 1)', accuracies1[index]))
+                    printf('{}: {:.3f}'.format('F-Score (TASK 1)', f_scores1[index]))
+                    printf('{}: {:.3f}'.format('Error Rate (TASK 1)', errors1[index]))
+                    printf('{}: {:.3f}'.format('Accuracy (TASK 2)', accuracies2[index]))
+                    printf('{}: {:.3f}'.format('F-Score (TASK 2)', f_scores2[index]))
+                    printf('\n')
 
                     checkpoint['task1_metric'] = task1_metric
                     checkpoint['task2_metric'] = task2_metric
@@ -448,6 +476,12 @@ def main():
     if not os.path.isdir(loss_path):
         os.makedirs(loss_path)
     save_loss_plots(train_loss1, train_loss2, valid_loss1, valid_loss2, train_loss, valid_loss, counts, loss_path)
+
+    scores_path = os.path.join(experiment_log_dir, 'scores')
+    if not os.path.isdir(scores_path):
+        os.makedirs(scores_path)
+    save_task1_plots(f_scores1, accuracies1, errors1, scores_path)
+    save_task2_plots(f_scores2, accuracies2, scores_path)
 
 if __name__ == '__main__':
     main()
