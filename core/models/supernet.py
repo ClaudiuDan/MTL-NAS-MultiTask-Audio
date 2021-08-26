@@ -185,6 +185,7 @@ class GeneralizedMTLNASNet(nn.Module):
         y = torch.reshape(y, (y.shape[0], 1, y.shape[1], y.shape[2]))
         xs, ys = [], []
         for stage_id in range(self.num_stages):
+            # print(stage_id, x.shape, y.shape)
             x = self.net1.stages[stage_id](x)
             y = self.net2.stages[stage_id](y)
             if isinstance(x, list):

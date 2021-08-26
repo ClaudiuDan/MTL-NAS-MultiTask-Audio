@@ -82,7 +82,7 @@ def save_loss_plots(train1, train2, valid1, valid2, train, valid, counts, filena
     plt.plot(counts, valid1, label='validation')
     plt.xlabel('Iteration')
     plt.ylabel('Loss')
-    plt.title('Event Classification (Task 1)')
+    plt.title('Event Detection (Task 1)')
     plt.legend()
 
     plt.subplot(312)
@@ -228,3 +228,50 @@ def save_connectivity(net1, net2, connectivity1, connectivity2, filename, align=
     
     img = Image.open(filename)
     return np.array(img).transpose((2, 0, 1))
+
+def save_task1_plots(fscores, accuracies, errors, filename):
+    plt.figure(figsize=(7, 6))
+    counts = range(0, len(fscores))
+    plt.subplot(311)
+    plt.plot(counts, fscores, label='test dataset')
+    plt.xlabel('Iteration')
+    plt.ylabel('F-Score')
+    plt.title('Event Detection (Task 1)')
+    plt.legend()
+
+    plt.subplot(312)
+    plt.plot(counts, accuracies, label='test dataset')
+    plt.xlabel('Iteration')
+    plt.ylabel('Accuracy')
+    plt.title('Event Detection  (Task 1)')
+    plt.legend()
+
+    plt.subplot(313)
+    plt.plot(counts, errors, label='test dataset')
+    plt.xlabel('Iteration')
+    plt.ylabel('Error Rate')
+    plt.title('Event Detection (Task 1)')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.savefig(filename + '/scores_task1')
+
+def save_task2_plots(fscores, accuracies, filename):
+    plt.figure(figsize=(7, 6))
+    counts = range(0, len(fscores))
+    plt.subplot(211)
+    plt.plot(counts, fscores, label='test dataset')
+    plt.xlabel('Iteration')
+    plt.ylabel('F-Score')
+    plt.title('Scene Classification (Task 2)')
+    plt.legend()
+
+    plt.subplot(212)
+    plt.plot(counts, accuracies, label='test dataset')
+    plt.xlabel('Iteration')
+    plt.ylabel('Accuracy')
+    plt.title('Scene Classification (Task 2)')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.savefig(filename + '/scores_task2')

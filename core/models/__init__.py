@@ -7,7 +7,7 @@ from .vgg16_lfov_bn_16_stages import DeepLabLargeFOVBN16
 from .jointly_event_branch import EventBranch
 from .jointly_scene_branch import SceneBranch
 
-def depth_limited_connectivity_matrix(stage_config, limit=3):
+def depth_limited_connectivity_matrix(stage_config, limit=10):
     """
 
     :param stage_config: list of number of layers in each stage
@@ -29,7 +29,7 @@ def vgg_connectivity():
     return depth_limited_connectivity_matrix([1, 4, 2])
 
 def event_scene_connectivity():
-    return depth_limited_connectivity_matrix([3, 2, 2])
+    return depth_limited_connectivity_matrix([1, 1, 1])
 
 def get_model(cfg, task1, task2):
     if cfg.TASK == 'pixel' or cfg.TASK == 'audio':

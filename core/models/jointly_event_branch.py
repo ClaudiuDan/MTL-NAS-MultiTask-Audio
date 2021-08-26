@@ -30,43 +30,22 @@ class EventBranch(nn.Module):
         self.stages = []
         layers = []
         stages = [
-            (64, [
+            (256, [
                 Reshape0(),
                 nn.MaxPool2d((8, 1)),
-                nn.Conv2d(in_dim, 64, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
+                nn.Conv2d(in_dim, 256, kernel_size=3, stride=1, padding=1, bias=False),
+                nn.BatchNorm2d(256, eps=1e-03, momentum=0.05),
                 nn.ReLU(inplace=True)
             ]),
-            (64, [
-                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-            (64, [
-                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-            (64, [
+            (256, [
                 nn.MaxPool2d((2, 1)),
-                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-            (64, [
-                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
+                nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1, bias=False),
+                nn.BatchNorm2d(256, eps=1e-03, momentum=0.05),
                 nn.ReLU(inplace=True)
             ]),
             (128, [
-                # nn.ConstantPad2d((0, 1, 0, 1), 0),  # TensorFlow 'SAME' behavior
                 nn.MaxPool2d((2, 1)),
-                nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=2, dilation=2, bias=False),
-                nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-            (128, [
-                nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=2, dilation=2, bias=False),
+                nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1, bias=False),
                 nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
                 nn.ReLU(inplace=True)
             ]),
