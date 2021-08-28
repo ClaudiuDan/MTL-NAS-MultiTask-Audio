@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from core.models.common_layers import Stage
+from core.models.common_layers import Stage, get_stages
 from core.config import cfg
 
 class DeepLabLargeFOVBN16(nn.Module):
@@ -13,64 +13,7 @@ class DeepLabLargeFOVBN16(nn.Module):
         
         self.stages = []
         layers = []
-        stages = [
-            (64, [
-                nn.MaxPool2d(3, stride=2),
-                nn.Conv2d(in_dim, 64, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-            (64, [
-                nn.MaxPool2d(3, stride=2),
-                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-            (64, [
-                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-            # (64, [
-            #     nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
-            #     nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
-            #     nn.ReLU(inplace=True)
-            # ]),
-            # (64, [
-            #     nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
-            #     nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
-            #     nn.ReLU(inplace=True)
-            # ]),
-            # (512, [
-            #     nn.ConstantPad2d((0, 1, 0, 1), 0),  # TensorFlow 'SAME' behavior
-            #     nn.MaxPool2d(3, stride=2),
-            #     nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1, bias=False),
-            #     nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
-            #     nn.ReLU(inplace=True)
-            # ]),
-            # (512, [
-            #     nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1, bias=False),
-            #     nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
-            #     nn.ReLU(inplace=True)
-            # ]),
-            # (512, [
-            #     nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1, bias=False),
-            #     nn.BatchNorm2d(512, eps=1e-03, momentum=0.05),
-            #     nn.ReLU(inplace=True)
-            # ]),
-            (128, [
-                nn.ConstantPad2d((0, 1, 0, 1), 0),  # TensorFlow 'SAME' behavior
-                nn.MaxPool2d(3, stride=2),
-                nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=2, dilation=2, bias=False),
-                nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-            # (128, [
-            #     nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=2, dilation=2, bias=False),
-            #     nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
-            #     nn.ReLU(inplace=True)
-            # ]),
-        ]
+        stages = get_stages(in_dim)
 
         for channels, stage in stages:
             layers += stage

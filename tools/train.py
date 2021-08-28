@@ -232,7 +232,7 @@ def main():
                     f_scores1.append(task1_metric['F-Score (TASK 1)'])
                     accuracies1.append(task1_metric['Accuracy (TASK 1)'].cpu())
                     errors1.append(task1_metric['Error-Rate Global (TASK 1)'].cpu())
-                    f_scores2.append(task2_metric['F-Score (TASK 2)'].cpu())
+                    f_scores2.append(task2_metric['F-Score (TASK 2)'])
                     accuracies2.append(task2_metric['Accuracy (TASK 2)'].cpu())
 
                     printf('\n')

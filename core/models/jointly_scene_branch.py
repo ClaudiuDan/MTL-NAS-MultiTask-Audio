@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from core.models.common_layers import Stage
+from core.models.common_layers import Stage, get_stages_frame
 from core.config import cfg
 
 class Reshape(torch.nn.Module):
@@ -8,9 +8,6 @@ class Reshape(torch.nn.Module):
         x = x.reshape(x.shape[0], -1)
         return x
 
-class Reshape0(torch.nn.Module):
-    def forward(self, x):
-        return x.permute(0, 1, 3, 2)
 
 class MaxpoolIf1(torch.nn.Module):
     def forward(self, x):
@@ -43,27 +40,7 @@ class SceneBranch(nn.Module):
         
         self.stages = []
         layers = []
-        stages = [
-            (256, [
-                Reshape0(),
-                nn.MaxPool2d((8, 1)),
-                nn.Conv2d(in_dim, 256, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(256, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-            (256, [
-                nn.MaxPool2d((2, 1)),
-                nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(256, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-            (128, [
-                nn.MaxPool2d((2, 1)),
-                nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1, bias=False),
-                nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
-                nn.ReLU(inplace=True)
-            ]),
-        ]
+        stages = get_stages_frame(in_dim)
 
         for channels, stage in stages:
             layers += stage

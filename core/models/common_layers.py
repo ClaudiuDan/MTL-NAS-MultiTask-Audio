@@ -14,8 +14,83 @@ class Stage(nn.Module):
         
     def forward(self, x):
         return self.feature(x)
-    
-    
+
+class Reshape0(torch.nn.Module):
+    def forward(self, x):
+        return x.permute(0, 1, 3, 2)
+
+def get_stages(in_dim):
+    stages = [
+        (32, [
+            nn.Conv2d(in_dim, 32, kernel_size=3, stride=2, padding=1, bias=False),
+            nn.BatchNorm2d(32, eps=1e-03, momentum=0.05),
+            nn.ReLU(inplace=True)
+        ]),
+        (32, [
+            nn.MaxPool2d(3, stride=2),
+            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.BatchNorm2d(32, eps=1e-03, momentum=0.05),
+            nn.ReLU(inplace=True)
+        ]),
+        (32, [
+            nn.MaxPool2d(3, stride=2),
+            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.BatchNorm2d(32, eps=1e-03, momentum=0.05),
+            nn.ReLU(inplace=True)
+        ]),
+        (32, [
+            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.BatchNorm2d(32, eps=1e-03, momentum=0.05),
+            nn.ReLU(inplace=True)
+        ]),
+        (32, [
+            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.BatchNorm2d(32, eps=1e-03, momentum=0.05),
+            nn.ReLU(inplace=True)
+        ]),
+        (32, [
+            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.BatchNorm2d(32, eps=1e-03, momentum=0.05),
+            nn.ReLU(inplace=True)
+        ]),
+        (128, [
+            nn.MaxPool2d(3, stride=2),
+            nn.Conv2d(32, 128, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
+            nn.ReLU(inplace=True)
+        ]),
+        (128, [
+            nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
+            nn.ReLU(inplace=True)
+        ]),
+    ]
+    return stages
+
+def get_stages_frame(in_dim):
+    stages = [
+        (64, [
+            Reshape0(),
+            nn.MaxPool2d((8, 1)),
+            nn.Conv2d(in_dim, 64, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.BatchNorm2d(64, eps=1e-03, momentum=0.05),
+            nn.ReLU(inplace=True)
+        ]),
+        (128, [
+            nn.MaxPool2d((2, 1)),
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
+            nn.ReLU(inplace=True)
+        ]),
+        (128, [
+            nn.MaxPool2d((2, 1)),
+            nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.BatchNorm2d(128, eps=1e-03, momentum=0.05),
+            nn.ReLU(inplace=True)
+        ]),
+    ]
+    return stages
+
 def batch_norm(num_features, eps=1e-3, momentum=0.05):
     bn = nn.BatchNorm2d(num_features, eps, momentum)
     nn.init.constant_(bn.weight, 1)

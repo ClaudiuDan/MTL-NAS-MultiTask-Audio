@@ -7,7 +7,7 @@ _C = CN()
 # General Parameters
 #########################################################################################
 _C.TASK = 'audio' # pixel (segmentation & normal) vs. image (classification)
-_C.TYPE = '_10Kms'
+_C.TYPE = '_100ms'
 _C.DATASET = 'nyu_v2'  # or 'taskonomy'
 
 _C.LOG_DIR = 'run'  # Tensorboard log directory
@@ -26,8 +26,8 @@ _C.MODEL.SHAREDFEATURE = False
 _C.MODEL.SUPERNET = False
 
 # Parameter for NAS
-_C.MODEL.BACKBONE = 'VGG16_13_Stage'
-# _C.MODEL.BACKBONE = 'Event_Scene'
+# _C.MODEL.BACKBONE = 'VGG16_13_Stage'
+_C.MODEL.BACKBONE = 'Event_Scene'
 
 _C.MODEL.INIT = (0.9, 0.1)
 
@@ -39,7 +39,6 @@ _C.MODEL.BATCH_NORM_MOMENTUM = 0.05
 
 _C.MODEL.NET1_CLASSES = 25
 _C.MODEL.NET2_CLASSES = 4
-
 
 #########################################################################################
 # Parameters for Architecture Search
@@ -53,7 +52,7 @@ _C.ARCH.MIXED_DATA = True
 
 # Optimization
 _C.ARCH.OPTIMIZER = 'GeneralizedMTLNAS'
-_C.ARCH.LR = 3e-3
+_C.ARCH.LR = 3e-1
 _C.ARCH.WEIGHT_DECAY = 1e-3
 
 # For Gumbel Softmax on model connections
@@ -99,8 +98,8 @@ _C.TRAIN.OUTPUT_SIZE = (100, 100)
 _C.TRAIN.WEIGHT_1 = 'DeepLab'
 _C.TRAIN.WEIGHT_2 = 'DeepLab'
 
-_C.TRAIN.BATCH_SIZE = 8
-_C.TRAIN.STEPS = 1001
+_C.TRAIN.BATCH_SIZE = 16
+_C.TRAIN.STEPS = 2001
 _C.TRAIN.WARMUP = 0
 _C.TRAIN.LR = 0.01
 _C.TRAIN.MOMENTUM = 0.9
@@ -109,12 +108,12 @@ _C.TRAIN.POWER = 0.9
 _C.TRAIN.NDDR_FACTOR = 100.
 _C.TRAIN.FC8_WEIGHT_FACTOR = 10.
 _C.TRAIN.FC8_BIAS_FACTOR = 20.
-_C.TRAIN.TASK2_FACTOR = 1.  # 20. for normal
+_C.TRAIN.TASK2_FACTOR = 0.01  # 20. for normal
 _C.TRAIN.SCHEDULE = 'Poly'
 
 _C.TRAIN.LOG_INTERVAL = 5
-_C.TRAIN.EVAL_INTERVAL = 100
-_C.TRAIN.SAVE_INTERVAL = 100
+_C.TRAIN.EVAL_INTERVAL = 50
+_C.TRAIN.SAVE_INTERVAL = 50
 _C.TRAIN.EVAL_CKPT = True
 
 
@@ -127,6 +126,6 @@ _C.TEST.RANDOM_SCALE = False
 _C.TEST.RANDOM_MIRROR = False
 _C.TEST.RANDOM_CROP = False
 
-_C.TEST.BATCH_SIZE = 8
+_C.TEST.BATCH_SIZE = 16
 
 _C.TEST.CKPT_ID = 20000
